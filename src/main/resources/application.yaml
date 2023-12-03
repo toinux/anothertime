@@ -1,0 +1,6 @@
+anothertime:
+  broker-url: tcp://localhost:1883
+spring:
+  threads:
+    virtual:
+      enabled: true
