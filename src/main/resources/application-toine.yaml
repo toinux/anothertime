@@ -1,0 +1,14 @@
+anothertime:
+  pause-if-hidden: true
+  week:
+    day-color: '#ff00ff'
+    week-color: cyan
+  time:
+    separator: fade
+    animation: fade
+  seconds:
+    color: '#ff00ff'
+  widgets:
+    animation: fade
+    calendar:
+      style: small
