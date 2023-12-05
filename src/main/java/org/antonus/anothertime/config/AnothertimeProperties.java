@@ -7,5 +7,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 public class AnothertimeProperties {
     private String brokerUrl = "tcp://localhost:1883";
-    private String apiUrl = "http://192.168.1.92/api";
+    private String awtrixUrl = "http://192.168.1.92";
+    private String awtrixTopic = "awtrix_xxx";
 }

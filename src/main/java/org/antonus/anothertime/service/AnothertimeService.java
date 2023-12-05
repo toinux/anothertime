@@ -1,56 +1,54 @@
 package org.antonus.anothertime.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.rest.AwtrixClient;
-import org.eclipse.paho.client.mqttv3.*;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.io.Closeable;
+import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class AnothertimeService implements Closeable {
 
     // Tick interval in ms.
-    private static final long TICK_INTERVAL = 20L;
+    private static final int TICK_INTERVAL = 65;
     private static final DateTimeFormatter FORMAT_HOUR = DateTimeFormatter.ofPattern("HH");
     private static final DateTimeFormatter FORMAT_MINUTES = DateTimeFormatter.ofPattern("mm");
-    private static final String TOPIC = "awtrix_986dd0/custom/anothertime";
+    private static final DateTimeFormatter FORMAT_HOUR_AND_MINUTES = DateTimeFormatter.ofPattern("HHmm");
+    private static final int ANIMATION_NONE = 0;
+    private static final int ANIMATION_SCROLL = 1;
+    private static final int ANIMATION_FADING = 2;
+
+    @Value("${anothertime.awtrix-topic}/custom/anothertime")
+    private String anothertimeTopic;
 
     private final ObjectMapper objectMapper;
 
     private final IMqttClient publisher;
     private final AwtrixClient awtrixClient;
 
-    private int i = 0;
-
-    public AnothertimeService(AnothertimeProperties anothertimeProperties, ObjectMapper objectMapper, AwtrixClient awtrixClient) throws MqttException {
-
-        publisher = new MqttClient(anothertimeProperties.getBrokerUrl(), UUID.randomUUID().toString(), new MemoryPersistence());
-        MqttConnectOptions options = new MqttConnectOptions();
-        options.setAutomaticReconnect(true);
-        options.setCleanSession(true);
-        options.setConnectionTimeout(10);
-        publisher.connect(options);
-
-        this.objectMapper = objectMapper;
-        this.awtrixClient = awtrixClient;
-
-    }
+    private final CacheManager cacheManager;
+    private final AwtrixService awtrixService;
 
     @Override
     public void close() {
@@ -62,10 +60,12 @@ public class AnothertimeService implements Closeable {
         }
     }
 
-    private List<Draw> drawTime(LocalTime time) {
+    private List<Draw> drawTime(LocalTime time, int animationType) {
+
+        var drawList = new ArrayList<Draw>();
 
         // TODO : xpos = 6 si pas de widgets
-        int xpos = -1;
+        int xpos = 0;
 
 
         boolean odd = time.getSecond() % 2 > 0;
@@ -73,23 +73,78 @@ public class AnothertimeService implements Closeable {
         float sepms = time.getLong(ChronoField.MILLI_OF_SECOND) / 1000f;
         float seppct = 0;
         if (odd) {
+            // TODO : option pour ne pas mettre de fading
             seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
         } else {
-            seppct= 0;
+            seppct = 0;
         }
 
-        Color separatorColor = new Color(seppct, seppct, seppct);
+        Color separatorColor = dimColor(Color.white, seppct);
 
 
-        // no animation
-        xpos = xpos + 2;
+        int timeAnimationDuration = switch (animationType) {
+            case ANIMATION_SCROLL -> 8 * TICK_INTERVAL;
+            case ANIMATION_FADING -> 16 * TICK_INTERVAL;
+            default -> 0;
+        };
 
-        Draw hourDraw = new Text(xpos, 1, time.format(FORMAT_HOUR), Color.white);
-        Draw sepDraw = new Text(xpos + 8, 1, ":", separatorColor);
-        Draw minutesDraw = new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), Color.white);
+        // number of ms since the beginning of this minute
+        long millis = 0;
+        if (timeAnimationDuration > 0) {
+            millis = time.getLong(ChronoField.MILLI_OF_SECOND) + time.getSecond() * 1000;
+        }
 
-        return List.of(hourDraw, sepDraw, minutesDraw);
+        // Animation during the first animationDuration in ms of the first minute
+        if (millis < timeAnimationDuration) {
 
+            // percentage of the animation (0 = started, 1 = finished)
+            float animationPct = (float) millis / timeAnimationDuration;
+            String timeString = time.format(FORMAT_HOUR_AND_MINUTES);
+            String previous = time.minus(Duration.ofMinutes(1)).format(FORMAT_HOUR_AND_MINUTES);
+            // calculate which digits changed
+            boolean[] o = new boolean[4];
+            for(int i = 0; i < 4; i++) {
+                // digit changed
+                if (timeString.charAt(i) != previous.charAt(i)) {
+                    // dran next on top of previous
+                    switch (animationType) {
+                        case ANIMATION_SCROLL -> {
+                            var ypos = (int) Math.floor(animationPct * 8);
+                            drawList.add(new Text(xpos, 1 + ypos - 8, String.valueOf(timeString.charAt(i)), Color.white));
+                            drawList.add(new Text(xpos, 1 + ypos, String.valueOf(previous.charAt(i)), Color.white));
+
+                        }
+                        case ANIMATION_FADING -> {
+                            if (animationPct < 0.5) {
+                                drawList.add(new Text(xpos, 1, String.valueOf(previous.charAt(i)), dimColor(Color.white, 1 - 2 * animationPct)));
+                            } else {
+                                drawList.add(new Text(xpos, 1, String.valueOf(timeString.charAt(i)), dimColor(Color.white, 2 * animationPct - 1)));
+                            }
+                        }
+                    }
+
+                } else {
+                    // digit did not change, no animation
+                    drawList.add(new Text(xpos, 1, String.valueOf(timeString.charAt(i)), Color.white));
+                }
+                // shift 4 characters after drawing for a digit
+                xpos += 4;
+
+                // add the separator after the second digit
+                if (i == 1 ) {
+                    drawList.add(new Text(xpos, 1, ":", separatorColor));
+                    xpos += 2;
+                }
+
+            }
+        } else {
+            // no animation
+            drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), Color.white));
+            drawList.add(new Text(xpos + 8, 1, ":", separatorColor));
+            drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), Color.white));
+        }
+
+        return drawList;
     }
 
     private List<Draw> drawSeconds(LocalTime time) {
@@ -131,40 +186,99 @@ End Sub
         int secondsProgressSize = 17;
         int second = time.getSecond();
 
-        drawList.add(new Line(0, 7, second * secondsProgressSize / 60, 7, Color.white));
+        if (second > 0) {
+            drawList.add(new Line(0, 7, second * secondsProgressSize / 60, 7, Color.white));
+        }
 
         return drawList;
     }
 
+    private List<Draw> drawWidgetTemperature(int offset) throws IOException, InterruptedException {
+
+        List<Draw> drawList = new ArrayList<>();
+
+        var temperatureIcon = awtrixService.getIcon("temperaturesmall.gif");
+
+        // TODO: gérer l'icone
+        boolean hasIcon = null != temperatureIcon;
+
+        if (outboundOffset(offset)) {
+            return Collections.emptyList();
+        }
+        int xpos = 19;
+
+        AwtrixStats awtrixStats = awtrixService.getStats();
+        int temp = null == awtrixStats ? 0 : awtrixStats.temp();
+        boolean tempNegative = false;
+        if (temp < 0) {
+            tempNegative = true;
+            temp = Math.abs(temp);
+        }
+
+        if (temp < 10) {
+            xpos += 4;
+        }
+
+        boolean tooLarge = temp > 99;
+        if (tooLarge) {
+            xpos -= 4;
+        }
+
+        if (hasIcon && !tooLarge) {
+            drawList.add(new Bitmap(tempNegative ? (temp > 9 ? xpos - 1 : xpos - 3) : xpos, offset, 8, 8, temperatureIcon));
+            xpos += 3;
+        }
+
+        // smaller '-' sign
+        if (tempNegative) {
+            if (!hasIcon || temp < 10) {
+                drawList.add(new Line(xpos + 1, 3 + offset, xpos + 2, 3 + offset, Color.white));
+            } else {
+                // Very small space : shift - sign next to the temperature digits when temperature icon
+                drawList.add(new Line(xpos + 2, 3 + offset, xpos + 3, 3 + offset, Color.white));
+            }
+        }
+
+        drawList.add(new Text(xpos + 3, 1 + offset, String.valueOf(temp), Color.white));
+
+        // smaller ° sign
+        if (!hasIcon || tooLarge) {
+            drawList.add(new Pixel(31, 1 + offset, Color.white));
+        }
+
+        return drawList;
+    }
+
+    private boolean outboundOffset(int offset) {
+        return Math.abs(offset) > 7;
+    }
+
     private Color dimColor(Color color, float percent) {
-        return new Color((int)(color.getRed() * percent), (int)(color.getGreen() * percent), (int)(color.getBlue() * percent));
+        return new Color((int) (color.getRed() * percent), (int) (color.getGreen() * percent), (int) (color.getBlue() * percent));
     }
 
     @Scheduled(fixedDelay = TICK_INTERVAL)
     @Async
-    public void tick() throws MqttException, JsonProcessingException {
+    public void tick() throws MqttException, IOException, InterruptedException {
         MqttMessage message = new MqttMessage();
 
         LocalTime time = LocalTime.now();
 
 
-
         List<Draw> drawList = new ArrayList<>();
-        drawList.addAll(drawTime(time));
+        drawList.addAll(drawTime(time, ANIMATION_FADING));
 
         drawList.addAll(drawSeconds(time));
 
+        // TODO: gérer le loop des widgets
+        drawList.addAll(drawWidgetTemperature(0));
 
         AwtrixPayload payload = AwtrixPayload.builder().draw(drawList).build();
         //awtrixClient.sendCustomAnothertime(payload);
 //        awtrixClient.sendCustomAnothertime(objectMapper.writeValueAsString(payload));
         message.setPayload(objectMapper.writeValueAsBytes(payload));
         message.setQos(0);
-        publisher.publish(TOPIC, message);
-    }
-
-    private static int rgb888(Color color) {
-        return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
+        publisher.publish(anothertimeTopic, message);
     }
 
 }
