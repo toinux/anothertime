@@ -6,6 +6,7 @@ anothertime:
   time:
     separator: fade
     animation: fade
+  default-color: white
 spring:
   threads:
     virtual:

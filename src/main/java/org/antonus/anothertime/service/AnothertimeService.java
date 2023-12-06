@@ -7,12 +7,10 @@ import org.antonus.anothertime.animationtypes.SeparatorAnimation;
 import org.antonus.anothertime.animationtypes.TimeAnimation;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.*;
-import org.antonus.anothertime.rest.AwtrixClient;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.CacheManager;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -45,9 +43,7 @@ public class AnothertimeService implements Closeable {
     private final ObjectMapper objectMapper;
 
     private final IMqttClient publisher;
-    private final AwtrixClient awtrixClient;
 
-    private final CacheManager cacheManager;
     private final AwtrixService awtrixService;
     private final AnothertimeProperties anothertimeProperties;
 
@@ -63,6 +59,8 @@ public class AnothertimeService implements Closeable {
 
     private List<Draw> drawTime(LocalTime time) {
 
+        Color timeColor = anothertimeProperties.getDefaultColor();
+
         var drawList = new ArrayList<Draw>();
 
         // TODO : xpos = 6 si pas de widgets
@@ -76,13 +74,13 @@ public class AnothertimeService implements Closeable {
         var separatorAnimation = anothertimeProperties.getTime().getSeparator();
         Color separatorColor = null;
         if (separatorAnimation == SeparatorAnimation.NONE) {
-            separatorColor = Color.white;
+            separatorColor = timeColor;
         } else if (odd) {
             switch (separatorAnimation) {
                 case FADE -> seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
                 case BLINK -> seppct = 1;
             }
-            separatorColor = dimColor(Color.white, seppct);
+            separatorColor = dimColor(timeColor, seppct);
         }
 
         int timeAnimationDuration = switch (anothertimeProperties.getTime().getAnimation()) {
@@ -105,7 +103,6 @@ public class AnothertimeService implements Closeable {
             String timeString = time.format(FORMAT_HOUR_AND_MINUTES);
             String previous = time.minus(Duration.ofMinutes(1)).format(FORMAT_HOUR_AND_MINUTES);
             // calculate which digits changed
-            boolean[] o = new boolean[4];
             for(int i = 0; i < 4; i++) {
                 // digit changed
                 if (timeString.charAt(i) != previous.charAt(i)) {
@@ -113,22 +110,19 @@ public class AnothertimeService implements Closeable {
                     switch (anothertimeProperties.getTime().getAnimation()) {
                         case SCROLL -> {
                             var ypos = (int) Math.floor(animationPct * 8);
-                            drawList.add(new Text(xpos, 1 + ypos - 8, String.valueOf(timeString.charAt(i)), Color.white));
-                            drawList.add(new Text(xpos, 1 + ypos, String.valueOf(previous.charAt(i)), Color.white));
+                            drawList.add(new Text(xpos, 1 + ypos - 8, String.valueOf(timeString.charAt(i)), timeColor));
+                            drawList.add(new Text(xpos, 1 + ypos, String.valueOf(previous.charAt(i)), timeColor));
 
                         }
                         case FADE -> {
-                            if (animationPct < 0.5) {
-                                drawList.add(new Text(xpos, 1, String.valueOf(previous.charAt(i)), dimColor(Color.white, 1 - 2 * animationPct)));
-                            } else {
-                                drawList.add(new Text(xpos, 1, String.valueOf(timeString.charAt(i)), dimColor(Color.white, 2 * animationPct - 1)));
-                            }
+                            char digitToPrint = ((animationPct < 0.5) ? previous : timeString).charAt(i);
+                            drawList.add(new Text(xpos, 1, String.valueOf(digitToPrint), dimColor(timeColor, (float) ((Math.cos(2 * Math.PI * animationPct) + 1) * 0.5))));
                         }
                     }
 
                 } else {
                     // digit did not change, no animation
-                    drawList.add(new Text(xpos, 1, String.valueOf(timeString.charAt(i)), Color.white));
+                    drawList.add(new Text(xpos, 1, String.valueOf(timeString.charAt(i)), timeColor));
                 }
                 // shift 4 characters after drawing for a digit
                 xpos += 4;
@@ -144,17 +138,19 @@ public class AnothertimeService implements Closeable {
             }
         } else {
             // no animation
-            drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), Color.white));
+            drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), timeColor));
             if (null != separatorColor) {
                 drawList.add(new Text(xpos + 8, 1, ":", separatorColor));
             }
-            drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), Color.white));
+            drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), timeColor));
         }
 
         return drawList;
     }
 
     private List<Draw> drawSeconds(LocalTime time) {
+
+        Color secondsColor = anothertimeProperties.getDefaultColor();
 
         List<Draw> drawList = new ArrayList<>();
         /*
@@ -194,7 +190,7 @@ End Sub
         int second = time.getSecond();
 
         if (second > 0) {
-            drawList.add(new Line(0, 7, second * secondsProgressSize / 60, 7, Color.white));
+            drawList.add(new Line(0, 7, second * secondsProgressSize / 60, 7, secondsColor));
         }
 
         return drawList;
