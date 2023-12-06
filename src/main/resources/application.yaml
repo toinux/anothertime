@@ -2,11 +2,13 @@ anothertime:
   broker-url: tcp://antonus.org:7001
   awtrix-url: http://192.168.1.92
   awtrix-topic: awtrix_986dd0
+  default-color: white
   pause-if-hidden: true
   time:
     separator: fade
     animation: fade
-  default-color: white
+  widgets:
+    animation: scroll
 spring:
   threads:
     virtual:

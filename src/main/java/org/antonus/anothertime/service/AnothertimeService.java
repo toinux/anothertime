@@ -6,7 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.antonus.anothertime.animationtypes.SeparatorAnimation;
 import org.antonus.anothertime.animationtypes.TimeAnimation;
 import org.antonus.anothertime.config.AnothertimeProperties;
-import org.antonus.anothertime.model.*;
+import org.antonus.anothertime.model.AwtrixPayload;
+import org.antonus.anothertime.model.Draw;
+import org.antonus.anothertime.model.Line;
+import org.antonus.anothertime.model.Text;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -23,7 +26,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -46,6 +48,8 @@ public class AnothertimeService implements Closeable {
 
     private final AwtrixService awtrixService;
     private final AnothertimeProperties anothertimeProperties;
+
+    private final WidgetService widgetService;
 
     @Override
     public void close() {
@@ -196,66 +200,6 @@ End Sub
         return drawList;
     }
 
-    private List<Draw> drawWidgetTemperature(int offset) throws IOException, InterruptedException {
-
-        List<Draw> drawList = new ArrayList<>();
-
-        var temperatureIcon = awtrixService.getIcon("temperaturesmall.gif");
-
-        // TODO: gérer l'icone
-        boolean hasIcon = null != temperatureIcon;
-
-        if (outboundOffset(offset)) {
-            return Collections.emptyList();
-        }
-        int xpos = 19;
-
-        AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
-        int temp = null == awtrixStats ? 0 : awtrixStats.temp();
-        boolean tempNegative = false;
-        if (temp < 0) {
-            tempNegative = true;
-            temp = Math.abs(temp);
-        }
-
-        if (temp < 10) {
-            xpos += 4;
-        }
-
-        boolean tooLarge = temp > 99;
-        if (tooLarge) {
-            xpos -= 4;
-        }
-
-        if (hasIcon && !tooLarge) {
-            drawList.add(new Bitmap(tempNegative ? (temp > 9 ? xpos - 1 : xpos - 3) : xpos, offset, 8, 8, temperatureIcon));
-            xpos += 3;
-        }
-
-        // smaller '-' sign
-        if (tempNegative) {
-            if (!hasIcon || temp < 10) {
-                drawList.add(new Line(xpos + 1, 3 + offset, xpos + 2, 3 + offset, Color.white));
-            } else {
-                // Very small space : shift - sign next to the temperature digits when temperature icon
-                drawList.add(new Line(xpos + 2, 3 + offset, xpos + 3, 3 + offset, Color.white));
-            }
-        }
-
-        drawList.add(new Text(xpos + 3, 1 + offset, String.valueOf(temp), Color.white));
-
-        // smaller ° sign
-        if (!hasIcon || tooLarge) {
-            drawList.add(new Pixel(31, 1 + offset, Color.white));
-        }
-
-        return drawList;
-    }
-
-    private boolean outboundOffset(int offset) {
-        return Math.abs(offset) > 7;
-    }
-
     private Color dimColor(Color color, float percent) {
         return new Color((int) (color.getRed() * percent), (int) (color.getGreen() * percent), (int) (color.getBlue() * percent));
     }
@@ -280,7 +224,7 @@ End Sub
         drawList.addAll(drawSeconds(time));
 
         // TODO: gérer le loop des widgets
-        drawList.addAll(drawWidgetTemperature(0));
+        widgetService.drawWidget().ifPresent(drawList::addAll);
 
         AwtrixPayload payload = AwtrixPayload.builder().draw(drawList).build();
         //awtrixClient.sendCustomAnothertime(payload);
