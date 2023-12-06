@@ -73,8 +73,8 @@ public class WidgetService {
             switch (widgetAnimation) {
                 case SCROLL -> {
                     int offset = (int) Math.floor(animationPct * 8);
-                    drawList.addAll(widgetList.get(previous).drawList(offset - 8, 1));
-                    drawList.addAll(widgetList.get(current).drawList(offset, 1));
+                    drawList.addAll(widgetList.get(current).drawList(offset - 8, 1));
+                    drawList.addAll(widgetList.get(previous).drawList(offset, 1));
                 }
                 case FADE -> {
                     float dim = (float) ((Math.cos(2 * Math.PI * animationPct) + 1) * 0.5);
@@ -89,6 +89,7 @@ public class WidgetService {
         return Optional.of(drawList);
     }
 
+    // TODO : parameter ce delay, mais pas moins de 2 secondes
     @Scheduled(fixedDelay = 5000L)
     @Async
     public void next() {
