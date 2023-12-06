@@ -14,6 +14,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -22,6 +23,8 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -61,14 +64,19 @@ public class AnothertimeApplication {
     }
 
     @Bean
-    CaffeineCache awtrixCache() {
-        return new CaffeineCache("awtrix", Caffeine.newBuilder().expireAfterWrite(20, TimeUnit.SECONDS).build());
-    }
-
-    @Bean
     CaffeineCache iconsCache() {
         return new CaffeineCache("icons", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
     }
 
+    @Bean("dimmedIconKeyGenerator")
+    public KeyGenerator keyGenerator() {
+        return (target, method, params) -> {
+
+            var dim = (float) params[1];
+            BigDecimal rounded = (new BigDecimal(dim)).setScale(2, RoundingMode.FLOOR);
+
+            return  params[0] + "_" + rounded;
+        };
+    }
 
 }

@@ -16,6 +16,8 @@ import java.awt.*;
 import java.awt.image.PixelGrabber;
 import java.io.ByteArrayInputStream;
 
+import static org.antonus.anothertime.utils.ColorUtils.rgb888;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -63,7 +65,5 @@ public class AwtrixService {
         return pixelArray;
     }
 
-    private static int rgb888(Color color) {
-        return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
-    }
+
 }

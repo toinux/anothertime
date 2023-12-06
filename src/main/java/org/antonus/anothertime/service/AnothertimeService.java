@@ -28,13 +28,15 @@ import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.antonus.anothertime.utils.ColorUtils.dimColor;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AnothertimeService implements Closeable {
 
     // Tick interval in ms.
-    private static final int TICK_INTERVAL = 65;
+    public static final int TICK_INTERVAL = 65;
     private static final DateTimeFormatter FORMAT_HOUR = DateTimeFormatter.ofPattern("HH");
     private static final DateTimeFormatter FORMAT_MINUTES = DateTimeFormatter.ofPattern("mm");
     private static final DateTimeFormatter FORMAT_HOUR_AND_MINUTES = DateTimeFormatter.ofPattern("HHmm");
@@ -198,10 +200,6 @@ End Sub
         }
 
         return drawList;
-    }
-
-    private Color dimColor(Color color, float percent) {
-        return new Color((int) (color.getRed() * percent), (int) (color.getGreen() * percent), (int) (color.getBlue() * percent));
     }
 
     @Scheduled(fixedDelay = TICK_INTERVAL)

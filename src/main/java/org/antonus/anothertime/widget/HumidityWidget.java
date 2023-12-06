@@ -5,24 +5,35 @@ import org.antonus.anothertime.model.Bitmap;
 import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.model.Text;
 import org.antonus.anothertime.service.AwtrixService;
+import org.antonus.anothertime.service.IconsService;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.antonus.anothertime.utils.ColorUtils.dimColor;
+
 public class HumidityWidget implements Widget {
 
     private final AwtrixService awtrixService;
+    private final IconsService iconsService;
 
-    public HumidityWidget(AwtrixService awtrixService) {
+    public HumidityWidget(AwtrixService awtrixService, IconsService iconsService) {
+        this.iconsService = iconsService;
         this.awtrixService = awtrixService;
     }
     @Override
     public List<Draw> drawList(int offset, float dim) {
+
+        Color color = dimColor(Color.white, dim);
+
         List<Draw> drawList = new ArrayList<>();
 
-        var humidityIcon = awtrixService.getIcon("smallhumidity.gif");
+        var humidityIcon = iconsService.getIcon("smallhumidity.gif");
+        if (dim < 1) {
+            humidityIcon = iconsService.getDimmedIcon("smallhumidity.gif", dim);
+        }
 
         // TODO: gérer l'icone
         boolean hasIcon = null != humidityIcon;
@@ -67,7 +78,7 @@ public class HumidityWidget implements Widget {
             xpos += 3;
         }
 
-        drawList.add(new Text(xpos + 3, 1 + offset, String.valueOf(humidity), Color.white));
+        drawList.add(new Text(xpos + 3, 1 + offset, String.valueOf(humidity), color));
 
         return drawList;
 

@@ -8,7 +8,7 @@ anothertime:
     separator: fade
     animation: fade
   widgets:
-    animation: scroll
+    animation: fade
 spring:
   threads:
     virtual:
