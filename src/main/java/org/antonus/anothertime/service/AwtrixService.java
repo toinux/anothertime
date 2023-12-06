@@ -1,6 +1,7 @@
 package org.antonus.anothertime.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +23,12 @@ public class AwtrixService {
 
     private final ObjectMapper objectMapper;
     private final AwtrixClient awtrixClient;
+
+    @Getter
     private AwtrixStats awtrixStats = null;
 
-    public AwtrixStats getStats() {
-        return awtrixStats;
-    }
+    @Getter
+    private String currentApp = "anothertime";
 
     @Cacheable(value = "icons", sync = true)
     public int[] getIcon(String iconName) {
@@ -42,6 +44,10 @@ public class AwtrixService {
     @SneakyThrows
     public void handleStats(MqttMessage message) {
         this.awtrixStats = objectMapper.readValue(message.getPayload(), AwtrixStats.class);
+    }
+
+    public void handleCurrentApp(MqttMessage message) {
+        currentApp = new String(message.getPayload());
     }
 
     private static int[] imageToBmp(Image image) throws InterruptedException {

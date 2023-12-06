@@ -1,5 +1,11 @@
 anothertime:
-  broker-url: tcp://localhost:1883
+  broker-url: tcp://antonus.org:7001
+  awtrix-url: http://192.168.1.92
+  awtrix-topic: awtrix_986dd0
+  pause-if-hidden: true
+  time:
+    separator: fade
+    animation: fade
 spring:
   threads:
     virtual:

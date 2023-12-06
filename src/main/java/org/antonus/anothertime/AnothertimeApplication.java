@@ -56,6 +56,7 @@ public class AnothertimeApplication {
         options.setConnectionTimeout(10);
         publisher.connect(options);
         publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats", (topic, message) -> awtrixServiceService.handleStats(message));
+        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats/currentApp", (topic, message) -> awtrixServiceService.handleCurrentApp(message));
         return publisher;
     }
 

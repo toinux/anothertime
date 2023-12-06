@@ -3,6 +3,9 @@ package org.antonus.anothertime.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.antonus.anothertime.animationtypes.SeparatorAnimation;
+import org.antonus.anothertime.animationtypes.TimeAnimation;
+import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
@@ -35,9 +38,6 @@ public class AnothertimeService implements Closeable {
     private static final DateTimeFormatter FORMAT_HOUR = DateTimeFormatter.ofPattern("HH");
     private static final DateTimeFormatter FORMAT_MINUTES = DateTimeFormatter.ofPattern("mm");
     private static final DateTimeFormatter FORMAT_HOUR_AND_MINUTES = DateTimeFormatter.ofPattern("HHmm");
-    private static final int ANIMATION_NONE = 0;
-    private static final int ANIMATION_SCROLL = 1;
-    private static final int ANIMATION_FADING = 2;
 
     @Value("${anothertime.awtrix-topic}/custom/anothertime")
     private String anothertimeTopic;
@@ -49,6 +49,7 @@ public class AnothertimeService implements Closeable {
 
     private final CacheManager cacheManager;
     private final AwtrixService awtrixService;
+    private final AnothertimeProperties anothertimeProperties;
 
     @Override
     public void close() {
@@ -60,7 +61,7 @@ public class AnothertimeService implements Closeable {
         }
     }
 
-    private List<Draw> drawTime(LocalTime time, int animationType) {
+    private List<Draw> drawTime(LocalTime time) {
 
         var drawList = new ArrayList<Draw>();
 
@@ -72,19 +73,21 @@ public class AnothertimeService implements Closeable {
 
         float sepms = time.getLong(ChronoField.MILLI_OF_SECOND) / 1000f;
         float seppct = 0;
-        if (odd) {
-            // TODO : option pour ne pas mettre de fading
-            seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
-        } else {
-            seppct = 0;
+        var separatorAnimation = anothertimeProperties.getTime().getSeparator();
+        Color separatorColor = null;
+        if (separatorAnimation == SeparatorAnimation.NONE) {
+            separatorColor = Color.white;
+        } else if (odd) {
+            switch (separatorAnimation) {
+                case FADE -> seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
+                case BLINK -> seppct = 1;
+            }
+            separatorColor = dimColor(Color.white, seppct);
         }
 
-        Color separatorColor = dimColor(Color.white, seppct);
-
-
-        int timeAnimationDuration = switch (animationType) {
-            case ANIMATION_SCROLL -> 8 * TICK_INTERVAL;
-            case ANIMATION_FADING -> 16 * TICK_INTERVAL;
+        int timeAnimationDuration = switch (anothertimeProperties.getTime().getAnimation()) {
+            case TimeAnimation.SCROLL -> 8 * TICK_INTERVAL;
+            case TimeAnimation.FADE -> 16 * TICK_INTERVAL;
             default -> 0;
         };
 
@@ -107,14 +110,14 @@ public class AnothertimeService implements Closeable {
                 // digit changed
                 if (timeString.charAt(i) != previous.charAt(i)) {
                     // dran next on top of previous
-                    switch (animationType) {
-                        case ANIMATION_SCROLL -> {
+                    switch (anothertimeProperties.getTime().getAnimation()) {
+                        case SCROLL -> {
                             var ypos = (int) Math.floor(animationPct * 8);
                             drawList.add(new Text(xpos, 1 + ypos - 8, String.valueOf(timeString.charAt(i)), Color.white));
                             drawList.add(new Text(xpos, 1 + ypos, String.valueOf(previous.charAt(i)), Color.white));
 
                         }
-                        case ANIMATION_FADING -> {
+                        case FADE -> {
                             if (animationPct < 0.5) {
                                 drawList.add(new Text(xpos, 1, String.valueOf(previous.charAt(i)), dimColor(Color.white, 1 - 2 * animationPct)));
                             } else {
@@ -132,7 +135,9 @@ public class AnothertimeService implements Closeable {
 
                 // add the separator after the second digit
                 if (i == 1 ) {
-                    drawList.add(new Text(xpos, 1, ":", separatorColor));
+                    if (null != separatorColor) {
+                        drawList.add(new Text(xpos, 1, ":", separatorColor));
+                    }
                     xpos += 2;
                 }
 
@@ -140,7 +145,9 @@ public class AnothertimeService implements Closeable {
         } else {
             // no animation
             drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), Color.white));
-            drawList.add(new Text(xpos + 8, 1, ":", separatorColor));
+            if (null != separatorColor) {
+                drawList.add(new Text(xpos + 8, 1, ":", separatorColor));
+            }
             drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), Color.white));
         }
 
@@ -207,7 +214,7 @@ End Sub
         }
         int xpos = 19;
 
-        AwtrixStats awtrixStats = awtrixService.getStats();
+        AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
         int temp = null == awtrixStats ? 0 : awtrixStats.temp();
         boolean tempNegative = false;
         if (temp < 0) {
@@ -260,13 +267,19 @@ End Sub
     @Scheduled(fixedDelay = TICK_INTERVAL)
     @Async
     public void tick() throws MqttException, IOException, InterruptedException {
+
+        // Do nothing if current app is not anothertime
+        if (anothertimeProperties.getPauseIfHidden() && !"anothertime".equals(awtrixService.getCurrentApp())) {
+            return;
+        }
+
         MqttMessage message = new MqttMessage();
 
         LocalTime time = LocalTime.now();
 
 
         List<Draw> drawList = new ArrayList<>();
-        drawList.addAll(drawTime(time, ANIMATION_FADING));
+        drawList.addAll(drawTime(time));
 
         drawList.addAll(drawSeconds(time));
 
