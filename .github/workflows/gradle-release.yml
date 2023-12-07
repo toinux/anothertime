@@ -8,8 +8,9 @@
 name: Gradle Package
 
 on:
-  release:
-    types: [created]
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -34,9 +35,9 @@ jobs:
       with:
         arguments: bootJar
 
-    - name: Upload a Build Artifact
-      uses: actions/upload-artifact@v3.1.3
+    - name: GH Release
+      uses: softprops/action-gh-release@v0.1.15
       with:
-        name: anothertime
-        path: build/libs/*.jar
+        files: |
+          build/libs/*.jar
 
