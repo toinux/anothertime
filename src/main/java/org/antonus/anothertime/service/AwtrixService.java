@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.antonus.anothertime.model.AwtrixSettings;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -41,6 +42,11 @@ public class AwtrixService {
             log.error("Could not retrieve icon {} : {}", iconName, e.getMessage());
         }
         return null;
+    }
+
+    @Cacheable(value = "settings", sync = true)
+    public AwtrixSettings getSettings() {
+        return awtrixClient.settings();
     }
 
     @SneakyThrows

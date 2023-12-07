@@ -1,9 +1,13 @@
 package org.antonus.anothertime.widget;
 
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.IconsService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -12,14 +16,14 @@ import java.util.List;
 
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 
+@Component
+@ConditionalOnProperty(value = "anothertime.widgets.temperature.enabled", matchIfMissing = true)
+@RequiredArgsConstructor
 public class TemperatureWidget implements Widget {
 
     private final AwtrixService awtrixService;
     private final IconsService iconsService;
-    public TemperatureWidget(AwtrixService awtrixService, IconsService iconsService) {
-        this.iconsService = iconsService;
-        this.awtrixService = awtrixService;
-    }
+    private final AnothertimeProperties anothertimeProperties;
 
     @Override
     @SneakyThrows
@@ -42,8 +46,7 @@ public class TemperatureWidget implements Widget {
         }
         int xpos = 19;
 
-        AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
-        int temp = null == awtrixStats ? 0 : awtrixStats.temp();
+        int temp = getTemperature();
         boolean tempNegative = false;
         if (temp < 0) {
             tempNegative = true;
@@ -82,5 +85,14 @@ public class TemperatureWidget implements Widget {
         }
 
         return drawList;
+    }
+
+    private int getTemperature() {
+        AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
+        int temp = null == awtrixStats ? 0 : awtrixStats.temp();
+        if (anothertimeProperties.getWidgets().getTemperature().getFahrenheit()) {
+            return (int) (temp * 1.8 + 32);
+        }
+        return temp;
     }
 }

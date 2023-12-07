@@ -19,4 +19,11 @@ public class ColorUtils {
     public static int rgb888(Color color) {
         return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
     }
+
+    public static Color rbg888(int color) {
+        int red = (color >> 16) & 0xFF;
+        int green = (color >> 8) & 0xFF;
+        int blue = color & 0xFF;
+        return new Color(red, green, blue);
+    }
 }

@@ -1,11 +1,14 @@
 package org.antonus.anothertime.widget;
 
+import lombok.RequiredArgsConstructor;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.model.Bitmap;
 import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.model.Text;
 import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.IconsService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -14,15 +17,14 @@ import java.util.List;
 
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 
+@Component
+@ConditionalOnProperty(value = "anothertime.widgets.humidity.enabled", matchIfMissing = true)
+@RequiredArgsConstructor
 public class HumidityWidget implements Widget {
 
     private final AwtrixService awtrixService;
     private final IconsService iconsService;
 
-    public HumidityWidget(AwtrixService awtrixService, IconsService iconsService) {
-        this.iconsService = iconsService;
-        this.awtrixService = awtrixService;
-    }
     @Override
     public List<Draw> drawList(int offset, float dim) {
 

@@ -3,13 +3,10 @@ package org.antonus.anothertime.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antonus.anothertime.animationtypes.SeparatorAnimation;
-import org.antonus.anothertime.animationtypes.TimeAnimation;
 import org.antonus.anothertime.config.AnothertimeProperties;
-import org.antonus.anothertime.model.AwtrixPayload;
-import org.antonus.anothertime.model.Draw;
-import org.antonus.anothertime.model.Line;
-import org.antonus.anothertime.model.Text;
+import org.antonus.anothertime.model.*;
+import org.antonus.anothertime.types.SeparatorAnimation;
+import org.antonus.anothertime.types.TimeAnimation;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
@@ -21,14 +18,19 @@ import org.springframework.stereotype.Service;
 import java.awt.*;
 import java.io.Closeable;
 import java.io.IOException;
+import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
+import static org.antonus.anothertime.utils.ColorUtils.rbg888;
 
 @Service
 @Slf4j
@@ -63,9 +65,15 @@ public class AnothertimeService implements Closeable {
         }
     }
 
+    public Color defaultColorIfNull(Color color) {
+        return Objects.requireNonNullElseGet(color, () -> rbg888(awtrixService.getSettings().TCOL()));
+    }
     private List<Draw> drawTime(LocalTime time) {
 
-        Color timeColor = anothertimeProperties.getDefaultColor();
+        Color hourColor = defaultColorIfNull(anothertimeProperties.getTime().getHourColor());
+        Color minutesColor = defaultColorIfNull(anothertimeProperties.getTime().getMinutesColor());
+        Color separatorColor = defaultColorIfNull(anothertimeProperties.getTime().getSeparatorColor());
+
 
         var drawList = new ArrayList<Draw>();
 
@@ -78,15 +86,14 @@ public class AnothertimeService implements Closeable {
         float sepms = time.getLong(ChronoField.MILLI_OF_SECOND) / 1000f;
         float seppct = 0;
         var separatorAnimation = anothertimeProperties.getTime().getSeparator();
-        Color separatorColor = null;
-        if (separatorAnimation == SeparatorAnimation.NONE) {
-            separatorColor = timeColor;
-        } else if (odd) {
-            switch (separatorAnimation) {
-                case FADE -> seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
-                case BLINK -> seppct = 1;
+        if (separatorAnimation != SeparatorAnimation.NONE) {
+            if (odd) {
+                switch (separatorAnimation) {
+                    case FADE -> seppct = (float) ((Math.cos(2 * Math.PI * sepms + Math.PI) + 1) * 0.5);
+                    case BLINK -> seppct = 1;
+                }
+                separatorColor = dimColor(separatorColor, seppct);
             }
-            separatorColor = dimColor(timeColor, seppct);
         }
 
         int timeAnimationDuration = switch (anothertimeProperties.getTime().getAnimation()) {
@@ -110,6 +117,7 @@ public class AnothertimeService implements Closeable {
             String previous = time.minus(Duration.ofMinutes(1)).format(FORMAT_HOUR_AND_MINUTES);
             // calculate which digits changed
             for(int i = 0; i < 4; i++) {
+                Color timeColor = i < 2 ? hourColor : minutesColor;
                 // digit changed
                 if (timeString.charAt(i) != previous.charAt(i)) {
                     // dran next on top of previous
@@ -144,11 +152,11 @@ public class AnothertimeService implements Closeable {
             }
         } else {
             // no animation
-            drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), timeColor));
+            drawList.add(new Text(xpos, 1, time.format(FORMAT_HOUR), hourColor));
             if (null != separatorColor) {
                 drawList.add(new Text(xpos + 8, 1, ":", separatorColor));
             }
-            drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), timeColor));
+            drawList.add(new Text(xpos + 10, 1, time.format(FORMAT_MINUTES), minutesColor));
         }
 
         return drawList;
@@ -156,7 +164,7 @@ public class AnothertimeService implements Closeable {
 
     private List<Draw> drawSeconds(LocalTime time) {
 
-        Color secondsColor = anothertimeProperties.getDefaultColor();
+        Color secondsColor = anothertimeProperties.getSeconds().getColor();
 
         List<Draw> drawList = new ArrayList<>();
         /*
@@ -202,6 +210,83 @@ End Sub
         return drawList;
     }
 
+    private List<Draw> drawWeek() {
+
+        List<Draw> drawList = new ArrayList<>();
+
+        Color weekDaysColor = anothertimeProperties.getWeek().getWeekColor();
+        Color currentDayColor = anothertimeProperties.getWeek().getDayColor();
+
+        DayOfWeek firstDay = anothertimeProperties.getWeek().getStartSunday() ? DayOfWeek.SUNDAY : DayOfWeek.MONDAY;
+        WeekFields weekFields = WeekFields.of(firstDay, 1);
+        int weekday = LocalDate.now().get(weekFields.dayOfWeek());
+
+        int xpos = 18;
+        switch (anothertimeProperties.getWeek().getStyle()) {
+            case LARGE -> {
+                drawList.add(new Line(xpos, 7, 31, 7, weekDaysColor));
+                drawList.add(new Line(xpos+(weekday-1)*2, 7, xpos+(weekday-1)*2+1, 7, currentDayColor));
+            }
+            case PROGRESS -> {
+                drawList.add(new Line(xpos, 7, 31, 7, weekDaysColor));
+                drawList.add(new Line(xpos, 7, xpos+(weekday-1)*2+1, 7, currentDayColor));
+            }
+            case DOTTED -> {
+                drawList.add(new Line(xpos, 7, 31, 7, Color.black));
+                for (int i = 0; i < 7; i++) {
+                    if (i == weekday - 1) {
+                        drawList.add(new Pixel(xpos+i*2,7,currentDayColor));
+                    } else {
+                        drawList.add(new Pixel(xpos+i*2,7,weekDaysColor));
+                    }
+                }
+            }
+            case DOTTED2 -> {
+                drawList.add(new Line(xpos, 7, 31, 7, Color.black));
+                for (int i = 0; i < 7; i++) {
+                    if (i == weekday - 1) {
+                        drawList.add(new Line(xpos, 7, xpos+1,7,currentDayColor));
+                        xpos += 3;
+                    } else {
+                        drawList.add(new Pixel(xpos, 7, weekDaysColor));
+                        xpos += 2;
+                    }
+                }
+            }
+        }
+
+        /*
+
+		Case "dotted2"
+			App.drawLine(xpos,7,31,7,Array As Int(0,0,0))
+
+			For i=0 To 6
+				If i=weekday-1 Then
+					App.drawLine(xpos,7, xpos+1, 7,CurrentDayColor)
+					xpos = xpos + 3
+				Else
+					App.drawPixel(xpos,7,WeekdaysColor)
+					xpos = xpos + 2
+				End If
+			Next
+
+		Case Else ' "dotted"
+			App.drawLine(xpos,7,31,7,Array As Int(0,0,0))
+
+			For i=0 To 6
+				If i=weekday-1 Then
+					App.drawPixel(xpos+i*2,7,CurrentDayColor)
+				Else
+					App.drawPixel(xpos+i*2,7,WeekdaysColor)
+				End If
+			Next
+
+	End Select
+	* */
+
+        return drawList;
+    }
+
     @Scheduled(fixedDelay = TICK_INTERVAL)
     @Async
     public void tick() throws MqttException, IOException, InterruptedException {
@@ -221,8 +306,9 @@ End Sub
 
         drawList.addAll(drawSeconds(time));
 
-        // TODO: gérer le loop des widgets
         widgetService.drawWidget().ifPresent(drawList::addAll);
+
+        drawList.addAll(drawWeek());
 
         AwtrixPayload payload = AwtrixPayload.builder().draw(drawList).build();
         //awtrixClient.sendCustomAnothertime(payload);

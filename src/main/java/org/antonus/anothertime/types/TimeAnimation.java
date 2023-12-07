@@ -1,4 +1,4 @@
-package org.antonus.anothertime.animationtypes;
+package org.antonus.anothertime.types;
 
 public enum TimeAnimation {
     NONE, SCROLL, FADE

@@ -1,10 +1,8 @@
 package org.antonus.anothertime.service;
 
-import org.antonus.anothertime.animationtypes.WidgetAnimation;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.Draw;
-import org.antonus.anothertime.widget.HumidityWidget;
-import org.antonus.anothertime.widget.TemperatureWidget;
+import org.antonus.anothertime.types.WidgetAnimation;
 import org.antonus.anothertime.widget.Widget;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -19,16 +17,13 @@ import static org.antonus.anothertime.service.AnothertimeService.TICK_INTERVAL;
 @Service
 public class WidgetService {
     private long activationTime = System.currentTimeMillis();
-
-    // TODO : à déterminer en fonction de l'animation
-    // private int animationDuration;
     private final WidgetAnimation widgetAnimation;
     private final List<Widget> widgetList;
     private int current = 0;
     private int previous = 0;
     private final long animationDuration;
 
-    public WidgetService(AnothertimeProperties anothertimeProperties, AwtrixService awtrixService, IconsService iconsService) {
+    public WidgetService(AnothertimeProperties anothertimeProperties, List<Widget> widgetList) {
 
         widgetAnimation = anothertimeProperties.getWidgets().getAnimation();
 
@@ -38,16 +33,7 @@ public class WidgetService {
             default -> 0;
         };
 
-        widgetList = new ArrayList<>();
-        AnothertimeProperties.WidgetsProperties widgets = anothertimeProperties.getWidgets();
-        if (widgets.getEnabled()) {
-            if (widgets.getTemperature().getEnabled()) {
-                widgetList.add(new TemperatureWidget(awtrixService, iconsService));
-            }
-            if (widgets.getHumidity().getEnabled()) {
-                widgetList.add(new HumidityWidget(awtrixService, iconsService));
-            }
-        }
+        this.widgetList = widgetList;
     }
 
     public Optional<List<Draw>> drawWidget() {

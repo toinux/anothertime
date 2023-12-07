@@ -1,9 +1,10 @@
 package org.antonus.anothertime.config;
 
 import lombok.Data;
-import org.antonus.anothertime.animationtypes.SeparatorAnimation;
-import org.antonus.anothertime.animationtypes.TimeAnimation;
-import org.antonus.anothertime.animationtypes.WidgetAnimation;
+import org.antonus.anothertime.types.SeparatorAnimation;
+import org.antonus.anothertime.types.TimeAnimation;
+import org.antonus.anothertime.types.WeekStyle;
+import org.antonus.anothertime.types.WidgetAnimation;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.awt.*;
@@ -15,15 +16,32 @@ public class AnothertimeProperties {
     private String awtrixUrl = "http://192.168.1.92";
     private String awtrixTopic = "awtrix_xxx";
     private Boolean pauseIfHidden = false;
-    private Time time = new Time();
+    private TimeProperties time = new TimeProperties();
+    private WeekProperties week = new WeekProperties();
     private WidgetsProperties widgets = new WidgetsProperties();
-    private Color defaultColor = Color.WHITE;
+    private SecondsProperties seconds = new SecondsProperties();
 
     @Data
-    public static class Time {
+    public static class SecondsProperties {
+        private Color color;
+    }
+    @Data
+    public static class TimeProperties {
         private TimeAnimation animation = TimeAnimation.SCROLL;
         private SeparatorAnimation separator = SeparatorAnimation.NONE;
+        private Color hourColor;
+        private Color minutesColor;
+        private Color separatorColor;
     }
+
+    @Data
+    public static class WeekProperties {
+        private Boolean startSunday = false;
+        private WeekStyle style = WeekStyle.DOTTED2;
+        private Color dayColor;
+        private Color weekColor = Color.darkGray;
+    }
+
 
     @Data
     public static class WidgetsProperties {
@@ -32,19 +50,23 @@ public class AnothertimeProperties {
         private TemperatureWidgetProperties temperature = new TemperatureWidgetProperties();
         private HumidityWidgetProperties humidity = new HumidityWidgetProperties();
         private Boolean enabled = true;
+
         @Data
-        public static class CalendarWidgetProperties {
+        public static class WidgetProperties {
             private Boolean enabled = true;
         }
 
         @Data
-        public static class TemperatureWidgetProperties {
-            private Boolean enabled = true;
+        public static class CalendarWidgetProperties extends WidgetProperties {
         }
 
         @Data
-        public static class HumidityWidgetProperties {
-            private Boolean enabled = true;
+        public static class TemperatureWidgetProperties extends WidgetProperties {
+            private Boolean fahrenheit = false;
+        }
+
+        @Data
+        public static class HumidityWidgetProperties extends WidgetProperties {
         }
     }
 

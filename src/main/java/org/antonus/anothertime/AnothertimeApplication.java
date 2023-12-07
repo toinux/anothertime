@@ -68,6 +68,11 @@ public class AnothertimeApplication {
         return new CaffeineCache("icons", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
     }
 
+    @Bean
+    CaffeineCache settingsCache() {
+        return new CaffeineCache("settings", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
+    }
+
     @Bean("dimmedIconKeyGenerator")
     public KeyGenerator keyGenerator() {
         return (target, method, params) -> {
