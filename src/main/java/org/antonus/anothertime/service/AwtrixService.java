@@ -10,6 +10,7 @@ import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -26,6 +27,7 @@ public class AwtrixService {
 
     private final ObjectMapper objectMapper;
     private final AwtrixClient awtrixClient;
+    private final ResourceLoader resourceLoader;
 
     @Getter
     private AwtrixStats awtrixStats = null;
@@ -34,12 +36,20 @@ public class AwtrixService {
     private String currentApp = "anothertime";
 
     @Cacheable(value = "icons", sync = true)
-    public int[] getIcon(String iconName) {
+    public int[] getIcon(String iconName, String defaultIcon) {
         try {
-            Image image = ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName)));
-            return imageToBmp(image);
+            return imageToBmp(ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName))));
         } catch (Exception e) {
-            log.error("Could not retrieve icon {} : {}", iconName, e.getMessage());
+            if (null != defaultIcon) {
+                log.info("could not load icon {}, loading default icon {} instead", iconName, defaultIcon);
+                try {
+                    return imageToBmp(ImageIO.read(resourceLoader.getResource("classpath:icons/" + defaultIcon).getInputStream()));
+                } catch (Exception e2) {
+                    log.error("Could not load default icon {} : {}", defaultIcon, e.getMessage());
+                }
+            } else {
+                log.error("Could not retrieve icon {} : {}", iconName, e.getMessage());
+            }
         }
         return null;
     }

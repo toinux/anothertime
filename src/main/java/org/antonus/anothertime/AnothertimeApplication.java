@@ -76,11 +76,14 @@ public class AnothertimeApplication {
     @Bean("dimmedIconKeyGenerator")
     public KeyGenerator keyGenerator() {
         return (target, method, params) -> {
+            // param0 : icon
+            // param1 : defaultIcon
+            // param2 : dim
 
-            var dim = (float) params[1];
+            var dim = (float) params[2];
             BigDecimal rounded = (new BigDecimal(dim)).setScale(2, RoundingMode.FLOOR);
 
-            return  params[0] + "_" + rounded;
+            return  params[0] + "_" + params[1] + "_" + rounded;
         };
     }
 

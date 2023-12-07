@@ -5,6 +5,8 @@ import org.antonus.anothertime.types.SeparatorAnimation;
 import org.antonus.anothertime.types.TimeAnimation;
 import org.antonus.anothertime.types.WeekStyle;
 import org.antonus.anothertime.types.WidgetAnimation;
+import org.antonus.anothertime.widget.HumidityWidget;
+import org.antonus.anothertime.widget.TemperatureWidget;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.awt.*;
@@ -54,6 +56,7 @@ public class AnothertimeProperties {
         @Data
         public static class WidgetProperties {
             private Boolean enabled = true;
+            private Color color;
         }
 
         @Data
@@ -63,10 +66,12 @@ public class AnothertimeProperties {
         @Data
         public static class TemperatureWidgetProperties extends WidgetProperties {
             private Boolean fahrenheit = false;
+            private String icon = TemperatureWidget.DEFAULT_ICON;
         }
 
         @Data
         public static class HumidityWidgetProperties extends WidgetProperties {
+            private String icon = HumidityWidget.DEFAULT_ICON;
         }
     }
 

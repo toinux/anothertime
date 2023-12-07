@@ -27,10 +27,8 @@ import java.time.temporal.ChronoField;
 import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
-import static org.antonus.anothertime.utils.ColorUtils.rbg888;
 
 @Service
 @Slf4j
@@ -54,6 +52,7 @@ public class AnothertimeService implements Closeable {
     private final AnothertimeProperties anothertimeProperties;
 
     private final WidgetService widgetService;
+    private final IconsService iconsService;
 
     @Override
     public void close() {
@@ -65,8 +64,8 @@ public class AnothertimeService implements Closeable {
         }
     }
 
-    public Color defaultColorIfNull(Color color) {
-        return Objects.requireNonNullElseGet(color, () -> rbg888(awtrixService.getSettings().TCOL()));
+    private Color defaultColorIfNull(Color color) {
+        return iconsService.defaultColorIfNull(color);
     }
     private List<Draw> drawTime(LocalTime time) {
 
@@ -291,7 +290,7 @@ End Sub
 
     @Scheduled(fixedDelay = TICK_INTERVAL)
     @Async
-    public void tick() throws MqttException, IOException, InterruptedException {
+    public void tick() throws MqttException, IOException {
 
         // Do nothing if current app is not anothertime
         if (anothertimeProperties.getPauseIfHidden() && !"anothertime".equals(awtrixService.getCurrentApp())) {

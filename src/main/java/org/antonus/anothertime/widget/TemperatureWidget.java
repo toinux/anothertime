@@ -3,6 +3,7 @@ package org.antonus.anothertime.widget;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
+import org.antonus.anothertime.config.AnothertimeProperties.WidgetsProperties.TemperatureWidgetProperties;
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.IconsService;
@@ -24,6 +25,7 @@ public class TemperatureWidget implements Widget {
     private final AwtrixService awtrixService;
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
+    public static final String DEFAULT_ICON = "temperaturesmall.gif";
 
     @Override
     @SneakyThrows
@@ -31,14 +33,11 @@ public class TemperatureWidget implements Widget {
 
         List<Draw> drawList = new ArrayList<>();
 
-        Color color = dimColor(Color.white, dim);
+        TemperatureWidgetProperties properties = anothertimeProperties.getWidgets().getTemperature();
+        Color color = dimColor(iconsService.defaultColorIfNull(properties.getColor()), dim);
 
-        var temperatureIcon = iconsService.getIcon("temperaturesmall.gif");
-        if (dim < 1) {
-            temperatureIcon = iconsService.getDimmedIcon("temperaturesmall.gif", dim);
-        }
+        var temperatureIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
 
-        // TODO: gérer l'icone
         boolean hasIcon = null != temperatureIcon;
 
         if (outboundOffset(offset)) {

@@ -1,6 +1,8 @@
 package org.antonus.anothertime.widget;
 
 import lombok.RequiredArgsConstructor;
+import org.antonus.anothertime.config.AnothertimeProperties;
+import org.antonus.anothertime.config.AnothertimeProperties.WidgetsProperties.HumidityWidgetProperties;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.model.Bitmap;
 import org.antonus.anothertime.model.Draw;
@@ -24,43 +26,24 @@ public class HumidityWidget implements Widget {
 
     private final AwtrixService awtrixService;
     private final IconsService iconsService;
+    private final AnothertimeProperties anothertimeProperties;
+    public final static String DEFAULT_ICON = "smallhumidity.gif";
 
     @Override
     public List<Draw> drawList(int offset, float dim) {
 
-        Color color = dimColor(Color.white, dim);
+        HumidityWidgetProperties properties = anothertimeProperties.getWidgets().getHumidity();
+        Color color = dimColor(iconsService.defaultColorIfNull(properties.getColor()), dim);
 
         List<Draw> drawList = new ArrayList<>();
 
-        var humidityIcon = iconsService.getIcon("smallhumidity.gif");
-        if (dim < 1) {
-            humidityIcon = iconsService.getDimmedIcon("smallhumidity.gif", dim);
-        }
+        var humidityIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
 
-        // TODO: gérer l'icone
         boolean hasIcon = null != humidityIcon;
 
         if (outboundOffset(offset)) {
             return Collections.emptyList();
         }
-
-        /*
-        	Dim xpos As Int = 19
-
-	' Won't manage 100%, cap to 99%
-	Dim hum As Int = Min(NumberFormat(getHumidity,0,0),99)
-
-	If hum < 10 Then
-		xpos = xpos + 4
-	End If
-
-	If humidityIcon Then
-		App.drawBMP(xpos,offset,App.getIcon(humidityIconId),8,8)
-		App.drawText(hum,xpos + 5,1+offset,Null)
-	Else
-		App
-        */
-
 
         int xpos = 19;
 
@@ -72,8 +55,6 @@ public class HumidityWidget implements Widget {
         if (humidity < 10) {
             xpos += 4;
         }
-
-
 
         if (hasIcon) {
             drawList.add(new Bitmap(xpos, offset, 8, 8, humidityIcon));
