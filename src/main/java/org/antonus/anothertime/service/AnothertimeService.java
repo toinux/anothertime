@@ -93,6 +93,8 @@ public class AnothertimeService implements Closeable {
                     case BLINK -> seppct = 1;
                 }
                 separatorColor = dimColor(separatorColor, seppct);
+            } else {
+                separatorColor = null;
             }
         }
 
