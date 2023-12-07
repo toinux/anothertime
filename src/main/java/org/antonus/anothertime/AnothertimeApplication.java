@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
@@ -41,7 +42,7 @@ public class AnothertimeApplication {
 
     @Bean
     AwtrixClient awtrixClient(RestClient.Builder builder, AnothertimeProperties anothertimeProperties) {
-
+        Assert.notNull(anothertimeProperties.getAwtrixUrl(),"Please set anothertime.awtrix-url");
         RestClient restClient = builder.baseUrl(anothertimeProperties.getAwtrixUrl()).requestFactory(new JdkClientHttpRequestFactory()).build();
 
         return HttpServiceProxyFactory.builder()
@@ -52,6 +53,7 @@ public class AnothertimeApplication {
 
     @Bean
     IMqttClient publisher(AnothertimeProperties anothertimeProperties, AwtrixService awtrixServiceService) throws MqttException {
+        Assert.notNull(anothertimeProperties.getBrokerUrl(),"Please set anothertime.broker-url");
         IMqttClient publisher = new MqttClient(anothertimeProperties.getBrokerUrl(), UUID.randomUUID().toString(), new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
         options.setAutomaticReconnect(true);

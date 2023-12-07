@@ -1,10 +1,8 @@
 package org.antonus.anothertime.config;
 
 import lombok.Data;
-import org.antonus.anothertime.types.SeparatorAnimation;
-import org.antonus.anothertime.types.TimeAnimation;
-import org.antonus.anothertime.types.WeekStyle;
-import org.antonus.anothertime.types.WidgetAnimation;
+import org.antonus.anothertime.types.*;
+import org.antonus.anothertime.widget.CalendarWidget;
 import org.antonus.anothertime.widget.HumidityWidget;
 import org.antonus.anothertime.widget.TemperatureWidget;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -14,9 +12,9 @@ import java.awt.*;
 @ConfigurationProperties(prefix = "anothertime")
 @Data
 public class AnothertimeProperties {
-    private String brokerUrl = "tcp://localhost:1883";
-    private String awtrixUrl = "http://192.168.1.92";
-    private String awtrixTopic = "awtrix_xxx";
+    private String brokerUrl;
+    private String awtrixUrl;
+    private String awtrixTopic;
     private Boolean pauseIfHidden = false;
     private TimeProperties time = new TimeProperties();
     private WeekProperties week = new WeekProperties();
@@ -29,8 +27,8 @@ public class AnothertimeProperties {
     }
     @Data
     public static class TimeProperties {
-        private TimeAnimation animation = TimeAnimation.SCROLL;
-        private SeparatorAnimation separator = SeparatorAnimation.NONE;
+        private TimeAnimation animation = TimeAnimation.FADE;
+        private SeparatorAnimation separator = SeparatorAnimation.FADE;
         private Color hourColor;
         private Color minutesColor;
         private Color separatorColor;
@@ -61,6 +59,11 @@ public class AnothertimeProperties {
 
         @Data
         public static class CalendarWidgetProperties extends WidgetProperties {
+            private CalendarStyle style = CalendarStyle.ICON;
+            private String icon = CalendarWidget.DEFAULT_ICON;
+            private Color headColor = Color.CYAN;
+            private Color bodyColor = Color.WHITE;
+            private Color textColor = Color.BLACK;
         }
 
         @Data

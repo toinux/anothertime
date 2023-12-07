@@ -1,0 +1,40 @@
+# colors format: logical name (red, green, cyan, ...) or hex value with quotew to avoid comment interpretation instead ('#ff00ff')
+# if color = null, the awtrix default color will be picked instead
+# if color = null on a color that already has a default value, this default value will be picked, like calendar's head-color: cyan
+anothertime:
+  broker-url: tcp://localhost:1883
+  awtrix-url: http://192.168.0.123
+  awtrix-topic: awtrix_xxxxxx
+  pause-if-hidden: false # true to stop sending to MQTT while app is not displayed
+  week:
+    start-sunday: false
+    style: dotted2 # large, progress, dotted, dotted2
+    day-color: null
+    week-color: darkGray
+  time:
+    separator: fade # none, blink, fade
+    animation: fade # none, scroll, fade
+    hour-color: null
+    minutes-color: null
+    separator-color: null
+  seconds:
+    color: null
+  widgets:
+    animation: scroll # none, scroll, fade
+    humidity:
+      enabled: true
+      color: null
+      icon: smallhumidity.gif
+    temperature:
+      fahrenheit: false
+      enabled: true
+      color: null
+      icon: temperaturesmall.gif
+    calendar:
+      enabled: true
+      style: large # icon, large, small
+      color: null
+      icon: bluecalendar.gif
+      head-color: cyan
+      body-color: white
+      text-color: black

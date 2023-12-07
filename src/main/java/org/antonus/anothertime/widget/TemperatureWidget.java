@@ -31,6 +31,10 @@ public class TemperatureWidget implements Widget {
     @SneakyThrows
     public List<Draw> drawList(int offset, float dim) {
 
+        if (outboundOffset(offset)) {
+            return Collections.emptyList();
+        }
+
         List<Draw> drawList = new ArrayList<>();
 
         TemperatureWidgetProperties properties = anothertimeProperties.getWidgets().getTemperature();
@@ -40,9 +44,6 @@ public class TemperatureWidget implements Widget {
 
         boolean hasIcon = null != temperatureIcon;
 
-        if (outboundOffset(offset)) {
-            return Collections.emptyList();
-        }
         int xpos = 19;
 
         int temp = getTemperature();

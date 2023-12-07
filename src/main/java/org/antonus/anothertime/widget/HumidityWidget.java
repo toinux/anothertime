@@ -32,6 +32,10 @@ public class HumidityWidget implements Widget {
     @Override
     public List<Draw> drawList(int offset, float dim) {
 
+        if (outboundOffset(offset)) {
+            return Collections.emptyList();
+        }
+
         HumidityWidgetProperties properties = anothertimeProperties.getWidgets().getHumidity();
         Color color = dimColor(iconsService.defaultColorIfNull(properties.getColor()), dim);
 
@@ -40,10 +44,6 @@ public class HumidityWidget implements Widget {
         var humidityIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
 
         boolean hasIcon = null != humidityIcon;
-
-        if (outboundOffset(offset)) {
-            return Collections.emptyList();
-        }
 
         int xpos = 19;
 

@@ -24,7 +24,7 @@ final class ColorConverter implements Converter<Object, Color> {
                 yield decodeColor(s);
             }
             case Integer i -> decodeColor(Integer.toString(i));
-            default -> Color.white;
+            default -> null;
         };
     }
 
@@ -32,7 +32,7 @@ final class ColorConverter implements Converter<Object, Color> {
         try {
             return Color.decode(s);
         } catch (NumberFormatException ignored) {
-            return Color.white;
+            return null;
         }
     }
 }

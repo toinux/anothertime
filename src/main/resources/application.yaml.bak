@@ -1,0 +1,31 @@
+anothertime:
+  broker-url: tcp://antonus.org:7001
+  awtrix-url: http://192.168.1.92
+  awtrix-topic: awtrix_986dd0
+  pause-if-hidden: true
+  week:
+    start-sunday: false
+    style: dotted2
+    day-color: '#ff00ff'
+    week-color: cyan
+  time:
+    separator: fade
+    animation: fade
+  seconds:
+    color: '#ff00ff'
+  widgets:
+    animation: fade
+    humidity:
+      enabled: true
+    temperature:
+      fahrenheit: false
+      enabled: false
+    calendar:
+      style: large
+spring:
+  threads:
+    virtual:
+      enabled: true
+  config:
+    import:
+      - optional:file:./anothertime.yaml
