@@ -56,6 +56,12 @@ public class AnothertimeApplication {
         Assert.notNull(anothertimeProperties.getBrokerUrl(),"Please set anothertime.broker-url");
         IMqttClient publisher = new MqttClient(anothertimeProperties.getBrokerUrl(), UUID.randomUUID().toString(), new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
+        if (null != anothertimeProperties.getBrokerUsername()) {
+            options.setUserName(anothertimeProperties.getBrokerUsername());
+        }
+        if (null != anothertimeProperties.getBrokerPassword()) {
+            options.setPassword(anothertimeProperties.getBrokerPassword().toCharArray());
+        }
         options.setAutomaticReconnect(true);
         options.setCleanSession(true);
         options.setConnectionTimeout(10);

@@ -13,6 +13,8 @@ import java.awt.*;
 @Data
 public class AnothertimeProperties {
     private String brokerUrl;
+    private String brokerUsername;
+    private String brokerPassword;
     private String awtrixUrl;
     private String awtrixTopic;
     private Boolean pauseIfHidden = false;
