@@ -7,7 +7,6 @@ import org.antonus.anothertime.model.Bitmap;
 import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.model.FilledRectangle;
 import org.antonus.anothertime.model.Text;
-import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.IconsService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,6 @@ import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 @RequiredArgsConstructor
 public class CalendarWidget implements Widget {
 
-    private final AwtrixService awtrixService;
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
     public final static String DEFAULT_ICON = "bluecalendar.gif";

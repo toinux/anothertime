@@ -256,35 +256,6 @@ End Sub
             }
         }
 
-        /*
-
-		Case "dotted2"
-			App.drawLine(xpos,7,31,7,Array As Int(0,0,0))
-
-			For i=0 To 6
-				If i=weekday-1 Then
-					App.drawLine(xpos,7, xpos+1, 7,CurrentDayColor)
-					xpos = xpos + 3
-				Else
-					App.drawPixel(xpos,7,WeekdaysColor)
-					xpos = xpos + 2
-				End If
-			Next
-
-		Case Else ' "dotted"
-			App.drawLine(xpos,7,31,7,Array As Int(0,0,0))
-
-			For i=0 To 6
-				If i=weekday-1 Then
-					App.drawPixel(xpos+i*2,7,CurrentDayColor)
-				Else
-					App.drawPixel(xpos+i*2,7,WeekdaysColor)
-				End If
-			Next
-
-	End Select
-	* */
-
         return drawList;
     }
 

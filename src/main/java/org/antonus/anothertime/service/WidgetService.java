@@ -50,7 +50,7 @@ public class WidgetService {
 
         long millis = System.currentTimeMillis() - activationTime;
 
-        // Animation during the first animationDuration in ms of the first minute
+        // Animation during the first animationDuration in ms after the last activationTime
         if (millis < animationDuration) {
 
             // percentage of the animation (0 = started, 1 = finished)
