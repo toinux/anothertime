@@ -1,13 +1,17 @@
 package org.antonus.anothertime;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.rest.AwtrixClient;
+import org.antonus.anothertime.service.AwtrixSensorService;
 import org.antonus.anothertime.service.AwtrixService;
+import org.antonus.anothertime.service.MqttSensorService;
+import org.antonus.anothertime.service.SensorService;
 import org.eclipse.paho.client.mqttv3.IMqttClient;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,14 +38,17 @@ import java.util.concurrent.TimeUnit;
 @EnableScheduling
 @EnableAsync
 @EnableCaching
+@RequiredArgsConstructor
 public class AnothertimeApplication {
+
+    private final AnothertimeProperties anothertimeProperties;
 
     public static void main(String[] args) {
         SpringApplication.run(AnothertimeApplication.class, args);
     }
 
     @Bean
-    AwtrixClient awtrixClient(RestClient.Builder builder, AnothertimeProperties anothertimeProperties) {
+    AwtrixClient awtrixClient(RestClient.Builder builder) {
         Assert.notNull(anothertimeProperties.getAwtrixUrl(),"Please set anothertime.awtrix-url");
         RestClient restClient = builder.baseUrl(anothertimeProperties.getAwtrixUrl()).requestFactory(new JdkClientHttpRequestFactory()).build();
 
@@ -52,7 +59,8 @@ public class AnothertimeApplication {
     }
 
     @Bean
-    IMqttClient publisher(AnothertimeProperties anothertimeProperties, AwtrixService awtrixServiceService) throws MqttException {
+    @SneakyThrows
+    IMqttClient publisher(AwtrixService awtrixService) {
         Assert.notNull(anothertimeProperties.getBrokerUrl(),"Please set anothertime.broker-url");
         IMqttClient publisher = new MqttClient(anothertimeProperties.getBrokerUrl(), UUID.randomUUID().toString(), new MemoryPersistence());
         MqttConnectOptions options = new MqttConnectOptions();
@@ -66,9 +74,30 @@ public class AnothertimeApplication {
         options.setCleanSession(true);
         options.setConnectionTimeout(10);
         publisher.connect(options);
-        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats", (topic, message) -> awtrixServiceService.handleStats(message));
-        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats/currentApp", (topic, message) -> awtrixServiceService.handleCurrentApp(message));
+        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats", (topic, message) -> awtrixService.handleStats(message));
+        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats/currentApp", (topic, message) -> awtrixService.handleCurrentApp(message));
         return publisher;
+    }
+
+    @Bean
+    @SneakyThrows
+    SensorService sensorService(IMqttClient publisher, AwtrixService awtrixService) {
+        return switch (anothertimeProperties.getSensorType()) {
+            case AWTRIX -> new AwtrixSensorService(awtrixService);
+            case MQTT -> {
+                MqttSensorService mqttSensorService = new MqttSensorService();
+                String topic = anothertimeProperties.getMqttSensor().getTopic();
+                String humidity = anothertimeProperties.getMqttSensor().getHumidity();
+                String temperature = anothertimeProperties.getMqttSensor().getTemperature();
+                if (null == topic) {
+                    publisher.subscribe(humidity, ((t, message) -> mqttSensorService.handleHumidity(message)));
+                    publisher.subscribe(temperature, ((t, message) -> mqttSensorService.handleTemperature(message)));
+                } else {
+                    publisher.subscribe(topic, ((t, message) -> mqttSensorService.handleJson(message, humidity, temperature)));
+                }
+                yield mqttSensorService;
+            }
+        };
     }
 
     @Bean

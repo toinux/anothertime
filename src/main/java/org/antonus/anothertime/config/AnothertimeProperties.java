@@ -22,6 +22,15 @@ public class AnothertimeProperties {
     private WeekProperties week = new WeekProperties();
     private WidgetsProperties widgets = new WidgetsProperties();
     private SecondsProperties seconds = new SecondsProperties();
+    private SensorType sensorType = SensorType.AWTRIX;
+    private MqttSensorProperties mqttSensor = new MqttSensorProperties();
+
+    @Data
+    public static class MqttSensorProperties {
+        private String topic;
+        private String humidity;
+        private String temperature;
+    }
 
     @Data
     public static class SecondsProperties {

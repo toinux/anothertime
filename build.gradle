@@ -26,6 +26,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'com.github.ben-manes.caffeine:caffeine'
+    implementation 'com.jayway.jsonpath:json-path'
+    implementation 'net.minidev:json-smart'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'

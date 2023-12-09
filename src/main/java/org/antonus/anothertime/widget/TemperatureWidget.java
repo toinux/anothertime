@@ -5,8 +5,8 @@ import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.config.AnothertimeProperties.WidgetsProperties.TemperatureWidgetProperties;
 import org.antonus.anothertime.model.*;
-import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.IconsService;
+import org.antonus.anothertime.service.SensorService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +22,7 @@ import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 @RequiredArgsConstructor
 public class TemperatureWidget implements Widget {
 
-    private final AwtrixService awtrixService;
+    private final SensorService sensorService;
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
     public static final String DEFAULT_ICON = "temperaturesmall.gif";
@@ -88,8 +88,7 @@ public class TemperatureWidget implements Widget {
     }
 
     private int getTemperature() {
-        AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
-        int temp = null == awtrixStats ? 0 : awtrixStats.temp();
+        int temp = sensorService.getTemperature();
         if (anothertimeProperties.getWidgets().getTemperature().getFahrenheit()) {
             return (int) (temp * 1.8 + 32);
         }
