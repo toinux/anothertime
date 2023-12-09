@@ -14,11 +14,11 @@ class MqttSensorServiceTest {
         message.setPayload("""
                 {
                     "humidity": -1.1,
-                    "temperature": 19.5
+                    "temperature": 19
                 }
                 """.getBytes());
         sensorService.handleJson(message, "$.humidity", "$.temperature");
-        assertEquals(20, sensorService.getTemperature());
+        assertEquals(19, sensorService.getTemperature());
         assertEquals(-1, sensorService.getHumidity());
 
     }

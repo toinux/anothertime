@@ -16,13 +16,19 @@ public class MqttSensorService implements  SensorService {
     public void handleJson(MqttMessage message, String humidityPath, String temperaturePath) {
         try {
             DocumentContext jsonContext = JsonPath.parse(new String(message.getPayload()));
-            Double humDouble = jsonContext.read(humidityPath);
-            Double tempDouble = jsonContext.read(temperaturePath);
-            humidity = Math.round(humDouble.floatValue());
-            temperature = Math.round(tempDouble.floatValue());
+            humidity = jsonValueToInt(jsonContext.read(humidityPath));
+            temperature = jsonValueToInt(jsonContext.read(temperaturePath));
         } catch (Exception e) {
             log.error("could not read humidity or temperature : {}", e.getMessage());
         }
+    }
+
+    private int jsonValueToInt(Object jsonValue) {
+        return switch (jsonValue) {
+            case Integer value -> value;
+            case Double value -> Math.round(value.floatValue());
+            default -> 0;
+        };
     }
 
     public void handleHumidity(MqttMessage message) {
