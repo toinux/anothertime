@@ -36,6 +36,6 @@ class MqttSensorServiceTest {
         MqttMessage message = new MqttMessage();
         message.setPayload("12.9".getBytes());
         sensorService.handleTemperature(message);
-        assertEquals(20, sensorService.getTemperature());
+        assertEquals(13, sensorService.getTemperature());
     }
 }
