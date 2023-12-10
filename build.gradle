@@ -42,8 +42,13 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.register('npmInstalls', NpmTask) {
+    workingDir = file("${project.projectDir}/front")
+    args = ["install"]
+}
+
 tasks.register('npmBuild', NpmTask) {
-    dependsOn npmInstall
+    dependsOn npmInstalls
     workingDir = file("${project.projectDir}/front")
     args = ["run", "build"]
     inputs.dir(fileTree("front/src").exclude("**/*.test.js").exclude("**/*.spec.js").exclude("**/__tests__/**/*.js"))
