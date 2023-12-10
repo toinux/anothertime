@@ -21,7 +21,7 @@ services:
 ```
 
 # Sensor
-Humidity and temperature are read by default from `<awtrix_topix>/stats` MQTT topic.
+Humidity and temperature are read by default from `<awtrix_topic>/stats` MQTT topic.
 
 It's possible to read these values from another MQTT topic :
 
