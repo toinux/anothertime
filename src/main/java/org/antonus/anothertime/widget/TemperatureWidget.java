@@ -59,7 +59,7 @@ public class TemperatureWidget implements Widget {
 
         boolean tooLarge = temp > 99;
         if (tooLarge) {
-            xpos -= 4;
+            xpos -= 3;
         }
 
         if (hasIcon && !tooLarge) {
@@ -70,10 +70,10 @@ public class TemperatureWidget implements Widget {
         // smaller '-' sign
         if (tempNegative) {
             if (!hasIcon || temp < 10) {
-                drawList.add(new Line(xpos + 1, 3 + offset, xpos + 2, 3 + offset, color));
+                drawList.add(new Line(xpos, 3 + offset, xpos + 1, 3 + offset, color));
             } else {
                 // Very small space : shift - sign next to the temperature digits when temperature icon
-                drawList.add(new Line(xpos + 2, 3 + offset, xpos + 3, 3 + offset, color));
+                drawList.add(new Line(xpos + 1, 3 + offset, xpos + 2, 3 + offset, color));
             }
         }
 
