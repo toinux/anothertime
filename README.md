@@ -1,5 +1,25 @@
 # anothertime
 
+# Run with docker
+
+Example of `docker-compose.yml`
+```yaml
+version: '2.1'
+services:
+    anothertime:
+        image: toinux/anothertime:latest
+        container_name: anothertime
+        restart: unless-stopped
+        environment:
+          - ANOTHERTIME_AWTRIX_TOPIC=awtrix                # awtrix MQTT prefix
+          - ANOTHERTIME_AWTRIX_URL=http://192.168.1.1      # awtrix URL
+          - ANOTHERTIME_BROKER_URL=tcp://192.168.1.2:1883  # MQTT URL
+          - ANOTHERTIME_BROKER_USERNAME=login              # MQTT login, remove this var if no login
+          - ANOTHERTIME_BROKER_PASSWORD=password           # MQTT password, remove this var if no password
+        volumes:
+          - /home/your/location:/data                      # put your customized anothertime.yaml here
+```
+
 # Sensor
 Humidity and temperature are read by default from `<awtrix_topix>/stats` MQTT topic.
 
