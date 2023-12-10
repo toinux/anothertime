@@ -40,23 +40,23 @@ out/
 
 ### React app ###
 # dependencies
-app/node_modules
-app/.pnp
-app/.pnp.js
+front/node_modules
+front/.pnp
+front/.pnp.js
 
 # testing
-app/coverage
+front/coverage
 
 # production
-app/build
+front/build
 
 # misc
-app/.DS_Store
-app/.env.local
-app/.env.development.local
-app/.env.test.local
-app/.env.production.local
+front/.DS_Store
+front/.env.local
+front/.env.development.local
+front/.env.test.local
+front/.env.production.local
 
-app/npm-debug.log*
-app/yarn-debug.log*
-app/yarn-error.log*
+front/npm-debug.log*
+front/yarn-debug.log*
+front/yarn-error.log*

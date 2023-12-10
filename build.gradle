@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
+    id "com.github.node-gradle.node" version "7.0.1"
 }
 
 group = 'org.antonus'
@@ -25,6 +26,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-json'
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'com.github.ben-manes.caffeine:caffeine'
     implementation 'com.jayway.jsonpath:json-path'
     implementation 'net.minidev:json-smart'
@@ -38,4 +40,24 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.register('npmBuild', NpmTask) {
+    dependsOn npmInstall
+    workingDir = file("${project.projectDir}/front")
+    args = ["run", "build"]
+    inputs.dir(fileTree("front/src").exclude("**/*.test.js").exclude("**/*.spec.js").exclude("**/__tests__/**/*.js"))
+    inputs.dir("front/node_modules")
+    inputs.dir("front/public")
+    outputs.dir("front/build")
+}
+
+tasks.register('copyReact', Copy) {
+    dependsOn npmBuild
+    from "front/build"
+    into 'build/resources/main/static/'
+}
+
+compileJava {
+    dependsOn copyReact
 }
