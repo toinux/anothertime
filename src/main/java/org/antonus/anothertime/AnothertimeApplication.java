@@ -1,9 +1,12 @@
 package org.antonus.anothertime;
 
+import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
+import org.antonus.anothertime.converters.ColorToStringConverter;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.antonus.anothertime.service.AwtrixSensorService;
 import org.antonus.anothertime.service.AwtrixService;
@@ -28,6 +31,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.UUID;
@@ -122,6 +126,13 @@ public class AnothertimeApplication {
 
             return  params[0] + "_" + params[1] + "_" + rounded;
         };
+    }
+
+    @Bean
+    Module colorModule() {
+        SimpleModule colorModule = new SimpleModule();
+        colorModule.addSerializer(Color.class, new ColorToStringConverter());
+        return colorModule;
     }
 
 }
