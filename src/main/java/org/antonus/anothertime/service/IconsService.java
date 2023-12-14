@@ -5,7 +5,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
-import java.util.Objects;
 
 import static org.antonus.anothertime.utils.ColorUtils.*;
 
@@ -33,6 +32,12 @@ public class IconsService {
     }
 
     public Color defaultColorIfNull(Color color) {
-        return Objects.requireNonNullElseGet(color, () -> rbg888(awtrixService.getSettings().TCOL()));
+        // little trick : consider colors with alpha=0 as default awtrix color
+        // if null, color would not be updated from REST api
+        if (null == color || color.getAlpha() == 0) {
+            return rbg888(awtrixService.getSettings().TCOL());
+        } else {
+            return color;
+        }
     }
 }
