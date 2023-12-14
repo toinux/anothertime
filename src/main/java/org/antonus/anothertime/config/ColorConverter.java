@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 
 @Component
 @ConfigurationPropertiesBinding
-final class ColorConverter implements Converter<Object, Color> {
+public final class ColorConverter implements Converter<Object, Color> {
     @Override
     public Color convert(Object source) {
 

@@ -1,6 +1,5 @@
 package org.antonus.anothertime.config;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.antonus.anothertime.types.*;
 import org.antonus.anothertime.widget.CalendarWidget;
@@ -13,15 +12,10 @@ import java.awt.*;
 @ConfigurationProperties(prefix = "anothertime")
 @Data
 public class AnothertimeProperties {
-    @JsonIgnore
     private String brokerUrl;
-    @JsonIgnore
     private String brokerUsername;
-    @JsonIgnore
     private String brokerPassword;
-    @JsonIgnore
     private String awtrixUrl;
-    @JsonIgnore
     private String awtrixTopic;
     private Boolean pauseIfHidden = false;
     private TimeProperties time = new TimeProperties();
@@ -66,7 +60,6 @@ public class AnothertimeProperties {
         private CalendarWidgetProperties calendar = new CalendarWidgetProperties();
         private TemperatureWidgetProperties temperature = new TemperatureWidgetProperties();
         private HumidityWidgetProperties humidity = new HumidityWidgetProperties();
-        private Boolean enabled = true;
 
         @Data
         public static class WidgetProperties {

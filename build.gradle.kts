@@ -10,6 +10,8 @@ plugins {
 group = "org.antonus"
 version = "0.0.5"
 
+val mapstructVersion = "1.5.5.Final"
+
 java {
     sourceCompatibility = JavaVersion.VERSION_21
 }
@@ -32,10 +34,13 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.jayway.jsonpath:json-path")
     implementation("net.minidev:json-smart")
+    implementation("org.mapstruct:mapstruct:${mapstructVersion}")
+    annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     annotationProcessor("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
 }

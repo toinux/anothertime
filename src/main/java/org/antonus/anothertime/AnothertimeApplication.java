@@ -6,7 +6,9 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
+import org.antonus.anothertime.config.ColorConverter;
 import org.antonus.anothertime.converters.ColorToStringConverter;
+import org.antonus.anothertime.converters.StringToColorConverter;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.antonus.anothertime.service.AwtrixSensorService;
 import org.antonus.anothertime.service.AwtrixService;
@@ -129,9 +131,10 @@ public class AnothertimeApplication {
     }
 
     @Bean
-    Module colorModule() {
+    Module colorModule(ColorConverter colorConverter) {
         SimpleModule colorModule = new SimpleModule();
         colorModule.addSerializer(Color.class, new ColorToStringConverter());
+        colorModule.addDeserializer(Color.class, new StringToColorConverter(colorConverter));
         return colorModule;
     }
 
