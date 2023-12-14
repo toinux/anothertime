@@ -13,6 +13,10 @@ public class ColorToStringConverter extends JsonSerializer<Color> {
 
     @Override
     public void serialize(Color value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeString("#"+Integer.toHexString(value.getRGB()).substring(2));
+        if (value.getAlpha() == 0) {
+            gen.writeNull();
+        } else {
+            gen.writeString("#" + Integer.toHexString(value.getRGB()).substring(2));
+        }
     }
 }
