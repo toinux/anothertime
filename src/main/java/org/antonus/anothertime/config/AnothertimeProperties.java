@@ -50,7 +50,7 @@ public class AnothertimeProperties {
         private Boolean startSunday = false;
         private WeekStyle style = WeekStyle.DOTTED2;
         private Color dayColor;
-        private Color weekColor = Color.darkGray;
+        private Color weekColor;
     }
 
 
