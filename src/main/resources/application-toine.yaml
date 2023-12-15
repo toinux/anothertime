@@ -12,6 +12,3 @@ anothertime:
     animation: fade
     calendar:
       style: small
-      enabled: false
-    humidity:
-      enabled: false
