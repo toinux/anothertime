@@ -1,5 +1,6 @@
 package org.antonus.anothertime.service;
 
+import lombok.RequiredArgsConstructor;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.types.WidgetAnimation;
@@ -9,36 +10,32 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.antonus.anothertime.service.AnothertimeService.TICK_INTERVAL;
 
 @Service
+@RequiredArgsConstructor
 public class WidgetService {
     private long activationTime = System.currentTimeMillis();
-    private final WidgetAnimation widgetAnimation;
-    private final List<Widget> widgetList;
+    private final AnothertimeProperties anothertimeProperties;
+    private final List<Widget> allWidgetList;
+    private List<Widget> widgetList = Collections.emptyList();
     private int current = 0;
     private int previous = 0;
-    private final long animationDuration;
-
-    public WidgetService(AnothertimeProperties anothertimeProperties, List<Widget> widgetList) {
-
-        widgetAnimation = anothertimeProperties.getWidgets().getAnimation();
-
-        animationDuration = switch (widgetAnimation) {
-            case SCROLL -> 8 * TICK_INTERVAL;
-            case FADE -> 16 * TICK_INTERVAL;
-            default -> 0;
-        };
-
-        this.widgetList = widgetList;
-    }
 
     public Optional<List<Draw>> drawWidget() {
 
         List<Draw> drawList = new ArrayList<>();
+
+        WidgetAnimation widgetAnimation = anothertimeProperties.getWidgets().getAnimation();
+        long animationDuration = switch (widgetAnimation) {
+            case SCROLL -> 8 * TICK_INTERVAL;
+            case FADE -> 16 * TICK_INTERVAL;
+            default -> 0;
+        };
 
         if (widgetList.isEmpty()) {
             return Optional.empty();
@@ -75,10 +72,11 @@ public class WidgetService {
         return Optional.of(drawList);
     }
 
-    // TODO : parameter ce delay, mais pas moins de 2 secondes
+    // TODO : parametrer ce delay, mais pas moins de 2 secondes
     @Scheduled(fixedDelay = 5000L)
     @Async
     public void next() {
+        widgetList = allWidgetList.stream().filter(Widget::enabled).toList();
         activationTime = System.currentTimeMillis();
         previous = current;
         current++;

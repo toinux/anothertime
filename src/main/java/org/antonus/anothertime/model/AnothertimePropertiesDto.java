@@ -37,6 +37,7 @@ public record AnothertimePropertiesDto(
         public record CalendarWidgetProperties(
                 Boolean enabled,
                 CalendarStyle style,
+                Color color,
                 String icon,
                 Color headColor,
                 Color bodyColor,

@@ -71,9 +71,9 @@ public class AnothertimeProperties {
         public static class CalendarWidgetProperties extends WidgetProperties {
             private CalendarStyle style = CalendarStyle.ICON;
             private String icon = CalendarWidget.DEFAULT_ICON;
-            private Color headColor = Color.CYAN;
-            private Color bodyColor = Color.WHITE;
-            private Color textColor = Color.BLACK;
+            private Color headColor;
+            private Color bodyColor;
+            private Color textColor;
         }
 
         @Data

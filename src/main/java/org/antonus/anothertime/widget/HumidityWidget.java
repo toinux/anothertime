@@ -8,7 +8,6 @@ import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.model.Text;
 import org.antonus.anothertime.service.IconsService;
 import org.antonus.anothertime.service.SensorService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -19,7 +18,6 @@ import java.util.List;
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 
 @Component
-@ConditionalOnProperty(value = "anothertime.widgets.humidity.enabled", matchIfMissing = true)
 @RequiredArgsConstructor
 public class HumidityWidget implements Widget {
 
@@ -27,6 +25,11 @@ public class HumidityWidget implements Widget {
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
     public final static String DEFAULT_ICON = "smallhumidity.gif";
+
+    @Override
+    public Boolean enabled() {
+        return anothertimeProperties.getWidgets().getHumidity().getEnabled();
+    }
 
     @Override
     public List<Draw> drawList(int offset, float dim) {

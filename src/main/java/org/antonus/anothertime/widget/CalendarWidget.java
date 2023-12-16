@@ -8,7 +8,6 @@ import org.antonus.anothertime.model.Draw;
 import org.antonus.anothertime.model.FilledRectangle;
 import org.antonus.anothertime.model.Text;
 import org.antonus.anothertime.service.IconsService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -20,13 +19,17 @@ import java.util.List;
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 
 @Component
-@ConditionalOnProperty(value = "anothertime.widgets.calendar.enabled", matchIfMissing = true)
 @RequiredArgsConstructor
 public class CalendarWidget implements Widget {
 
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
     public final static String DEFAULT_ICON = "bluecalendar.gif";
+
+    @Override
+    public Boolean enabled() {
+        return anothertimeProperties.getWidgets().getCalendar().getEnabled();
+    }
 
     @Override
     public List<Draw> drawList(int offset, float dim) {
@@ -37,9 +40,9 @@ public class CalendarWidget implements Widget {
 
         CalendarWidgetProperties properties = anothertimeProperties.getWidgets().getCalendar();
         Color color = dimColor(iconsService.defaultColorIfNull(properties.getColor()), dim);
-        Color calendarHeadColor = dimColor(properties.getHeadColor(), dim);
-        Color calendarBodyColor = dimColor(properties.getBodyColor(), dim);
-        Color calendarTextColor = dimColor(properties.getTextColor(), dim);
+        Color calendarHeadColor = dimColor(iconsService.defaultColorIfNull(properties.getHeadColor(), Color.CYAN), dim);
+        Color calendarBodyColor = dimColor(iconsService.defaultColorIfNull(properties.getBodyColor(), Color.WHITE), dim);
+        Color calendarTextColor = dimColor(iconsService.defaultColorIfNull(properties.getTextColor(), Color.BLACK), dim);
 
         List<Draw> drawList = new ArrayList<>();
 

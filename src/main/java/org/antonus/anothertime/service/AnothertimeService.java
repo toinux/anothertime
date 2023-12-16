@@ -165,7 +165,7 @@ public class AnothertimeService implements Closeable {
 
     private List<Draw> drawSeconds(LocalTime time) {
 
-        Color secondsColor = anothertimeProperties.getSeconds().getColor();
+        Color secondsColor = iconsService.defaultColorIfNull(anothertimeProperties.getSeconds().getColor());
 
         List<Draw> drawList = new ArrayList<>();
         /*
