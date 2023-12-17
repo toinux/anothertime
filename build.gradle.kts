@@ -1,4 +1,5 @@
-import com.github.gradle.node.npm.task.NpmTask
+import com.github.gradle.node.yarn.task.YarnInstallTask
+import com.github.gradle.node.yarn.task.YarnTask
 
 plugins {
     java
@@ -49,25 +50,28 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-
-val npmInstalls = tasks.register<NpmTask>("npmInstalls") {
-    workingDir = file("${project.projectDir}/front")
-    args.set(listOf("install"))
+tasks.npmInstall {
+    enabled=false
 }
 
-val npmBuild = tasks.register<NpmTask>("npmBuild") {
-    dependsOn(npmInstalls)
+tasks.named<YarnInstallTask>(YarnInstallTask.NAME){
     workingDir = file("${project.projectDir}/front")
-    args.set(listOf("run","build"))
+    ignoreExitValue.set(true)
+}
+
+val yarnBuild = tasks.register<YarnTask>("yarnBuild") {
+    dependsOn(YarnInstallTask.NAME)
+    workingDir = file("${project.projectDir}/front")
+    args.set(listOf("build"))
     inputs.dir(fileTree("front/src").exclude("**/*.test.js").exclude("**/*.spec.js").exclude("**/__tests__/**/*.js"))
     inputs.dir("front/node_modules")
-    inputs.dir("front/public")
-    outputs.dir("front/build")
+    outputs.dir("front/dist")
 }
 
+
 val copyReact = tasks.register<Copy>("copyReact") {
-    dependsOn(npmBuild)
-    from("front/build")
+    dependsOn(yarnBuild)
+    from("front/dist")
     into("build/resources/main/static/")
 }
 
