@@ -35,7 +35,11 @@ public class MqttSensorService implements  SensorService {
         try {
             humidity = Math.round((float) Double.parseDouble(new String(message.getPayload())));
         } catch (Exception e) {
-            log.error("could not read humidity : {}", e.getMessage());
+            try {
+                log.error("could not read humidity : {}",new String(message.getPayload()), e);
+            } catch (Exception ee) {
+                log.error("could not read humidity",e);
+            }
         }
 
     }
@@ -44,7 +48,12 @@ public class MqttSensorService implements  SensorService {
         try {
             temperature = Math.round((float) Double.parseDouble(new String(message.getPayload())));
         } catch (Exception e) {
-            log.error("could not read temperature : {}", e.getMessage());
+            try {
+                log.error("could not read temperature : {}",new String(message.getPayload()), e);
+            } catch (Exception ee ) {
+                log.error("could not read temperature", e);
+            }
+
         }
     }
 }
