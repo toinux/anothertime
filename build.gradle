@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'org.antonus'
-version = '0.0.5'
+version = '0.0.6'
 
 java {
     sourceCompatibility = '21'
