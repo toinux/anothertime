@@ -1,5 +1,7 @@
 import {Spinner} from "react-bootstrap";
 import {useFetch} from "./hooks/useFetch.js";
+import {Time} from "./components/Time.jsx";
+import {useState} from "react";
 
 function App() {
 
@@ -15,13 +17,30 @@ function App() {
     // }, []);
 
     const {loading, data, errors} = useFetch("/config");
+    const [config, setConfig] = useState(null);
+
+    // useEffect(() => {
+    //     setConfig(data);
+    // }, [data]);
+    //
+    // useEffect(() => {
+    //         fetch("/config", {
+    //             headers: {
+    //                 'Accept': 'application/json',
+    //                 'Content-Type': 'application/json'
+    //             },
+    //             method: "POST",
+    //             body: JSON.stringify(config)
+    //         })
+    //             .then(function(res){ console.log(res) })
+    //             .catch(function(res){ console.log(res) })
+    // }, [config]);
 
     return (
         <div className="container">
             <h1>Hello</h1>
             {loading && <Spinner animation="border"/>}
-            {data && <><p>Time animation : {data.time.animation}</p>
-                    <pre>{JSON.stringify(data)}</pre></>}
+            {data && <Time time={data.time}/>}
         </div>
     )
 }
