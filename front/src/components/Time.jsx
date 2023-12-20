@@ -1,13 +1,12 @@
-import {Card, Form} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import {FormSelect} from "./FormSelect.jsx";
 import {FormColor} from "./FormColor.jsx";
+import {SettingsContainer} from "./SettingsContainer.jsx";
 
 export function Time({props}) {
 
-     return <Card className="mb-3">
-      <Card.Body>
-        <Card.Title>Time settings</Card.Title>
-        <Form>
+     return <SettingsContainer title="Time">
+         <Form>
             <FormSelect defaultValue={props.time.animation} values={['NONE', 'SCROLL', 'FADE']}
                         label={'Time animation'} propertyName="time.animation"/>
             <FormSelect defaultValue={props.time.separator} values={['NONE', 'BLINK', 'FADE']}
@@ -17,7 +16,6 @@ export function Time({props}) {
           <FormColor defaultValue={props.time.separatorColor} label={'Separator color'}
                      propertyName="time.separatorColor"/>
         </Form>
-      </Card.Body>
-    </Card>
+</SettingsContainer>
 
 }

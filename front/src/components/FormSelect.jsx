@@ -1,4 +1,4 @@
-import {Form} from "react-bootstrap";
+import {Form, InputGroup} from "react-bootstrap";
 import {useId} from "react";
 import {updateAnothertime} from "../lib/updateAnothertime.js";
 
@@ -9,13 +9,16 @@ export function FormSelect({label, defaultValue, values, propertyName}) {
 
     const id = useId();
     return <Form.Group className="mb-3" controlId={id}>
-            <Form.Label>{label}</Form.Label>
-            <Form.Select defaultValue={defaultValue} onChange={handleChange}>
+        <InputGroup>
+            <Form.Label style={{height: "2.5rem"}} className="input-group-text">{label}</Form.Label>
+            <Form.Select style={{height: "2.5rem"}} defaultValue={defaultValue} onChange={handleChange}>
                 {
                     values.map(o => {
                         return (<option key={o} value={o}>{o}</option>)
                     })
                 }
             </Form.Select>
-        </Form.Group>
+        </InputGroup>
+    </Form.Group>
+
 }

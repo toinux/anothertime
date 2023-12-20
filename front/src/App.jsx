@@ -1,8 +1,13 @@
 import {Spinner} from "react-bootstrap";
 import {useFetch} from "./hooks/useFetch.js";
 import {Time} from "./components/Time.jsx";
+import {Week} from "./components/Week.jsx";
 import {useState} from "react";
 import {Seconds} from "./components/Seconds.jsx";
+import {Widgets} from "./components/Widgets.jsx";
+import {CalendarWidget} from "./components/CalendarWidget.jsx";
+import {TemperatureWidget} from "./components/TemperatureWidget.jsx";
+import {HumidityWidget} from "./components/HumidityWidget.jsx";
 
 function App() {
 
@@ -44,6 +49,11 @@ function App() {
             {data && <>
                 <Time props={data} />
                 <Seconds props={data} />
+                <Week props={data} />
+                <Widgets props={data} />
+                <CalendarWidget props={data} />
+                <TemperatureWidget props={data} />
+                <HumidityWidget props={data} />
             </>
             }
         </div>

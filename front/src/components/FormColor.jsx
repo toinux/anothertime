@@ -5,11 +5,11 @@ import {updateAnothertime} from "../lib/updateAnothertime.js";
 export function FormColor({label, defaultValue, propertyName}) {
     const id = useId();
 
-    const [checked, setChecked] = useState(defaultValue == null);
+    const [checked, setChecked] = useState(defaultValue !== null);
     const [color, setColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
 
     const handleCheck = (e) => {
-        updateAnothertime(propertyName, e.target.checked ? "default" : color);
+        updateAnothertime(propertyName, e.target.checked ? color : "default");
         setChecked(e.target.checked);
     }
 
@@ -19,13 +19,12 @@ export function FormColor({label, defaultValue, propertyName}) {
     }
 
     return <Form.Group className="mb-3" controlId={id}>
-        <Form.Label>{label}</Form.Label>
         <div className="row">
             <div className="col-auto">
-                <Form.Check type="switch" label="Use default color" checked={checked} onChange={handleCheck}/>
+                <Form.Check type="switch" label={label} checked={checked} onChange={handleCheck}/>
             </div>
             <div className="col-auto">
-                {!checked &&
+                {checked &&
                     <Form.Control type="color" defaultValue={color} onChange={handleChange}
                                   title="Choose your color"/>}
             </div>
