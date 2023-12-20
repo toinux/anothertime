@@ -5,7 +5,9 @@ import org.antonus.anothertime.model.Draw;
 import java.util.List;
 
 public interface Widget {
-    public List<Draw> drawList(int offset, float dim);
+    List<Draw> drawList(int offset, float dim);
+
+    Boolean enabled();
 
     default Boolean outboundOffset(int offset) {
         return Math.abs(offset) > 7;

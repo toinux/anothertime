@@ -1,0 +1,65 @@
+###
+
+POST http://192.168.1.2:8080/config
+Content-Type: application/json
+
+{
+  "time": {
+    "animation": "SCROLL",
+    "separator": "FADE",
+    "minutesColor": "default",
+    "hourColor": "default",
+    "separatorColor": "default"
+  },
+  "week": {
+    "startSunday": false,
+    "style": "DOTTED2",
+    "dayColor" : "#ff00ff",
+    "weekColor" : "cyan"
+  },
+  "widgets": {
+    "animation": "SCROLL",
+    "calendar": {
+      "style": "ICON",
+      "color": "default",
+      "bodyColor": "default",
+      "headColor": "default",
+      "textColor": "default",
+      "icon": "bluecalendar.gif"
+    },
+    "humidity": {
+      "icon": "smallhumidity.gif",
+      "color": "default"
+    },
+    "temperature": {
+      "fahrenheit": false,
+      "icon": "temperaturesmall.gif",
+      "color": "default"
+    }
+  },
+  "seconds": {
+    "color": "#ff00ff"
+  }
+}
+
+###
+
+POST http://192.168.1.2:8080/config
+Content-Type: application/json
+
+{
+  "widgets": {
+    "calendar": {
+      "enabled": false
+    },
+    "humidity": {
+      "enabled": true
+    },
+    "temperature": {
+      "enabled": true
+    }
+  }
+}
+
+###
+

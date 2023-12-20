@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 
 @Component
 @ConfigurationPropertiesBinding
-final class ColorConverter implements Converter<Object, Color> {
+public final class ColorConverter implements Converter<Object, Color> {
     @Override
     public Color convert(Object source) {
 
@@ -30,6 +30,10 @@ final class ColorConverter implements Converter<Object, Color> {
 
     private Color decodeColor(String s) {
         try {
+            if ("null".equalsIgnoreCase(s) || "default".equalsIgnoreCase(s)) {
+                // non-null color with alpha=0 for default awtrix color
+                return new Color(0,0,0,0);
+            }
             return Color.decode(s);
         } catch (NumberFormatException ignored) {
             return null;

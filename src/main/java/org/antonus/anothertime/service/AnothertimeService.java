@@ -165,7 +165,7 @@ public class AnothertimeService implements Closeable {
 
     private List<Draw> drawSeconds(LocalTime time) {
 
-        Color secondsColor = anothertimeProperties.getSeconds().getColor();
+        Color secondsColor = iconsService.defaultColorIfNull(anothertimeProperties.getSeconds().getColor());
 
         List<Draw> drawList = new ArrayList<>();
         /*
@@ -215,8 +215,8 @@ End Sub
 
         List<Draw> drawList = new ArrayList<>();
 
-        Color weekDaysColor = anothertimeProperties.getWeek().getWeekColor();
-        Color currentDayColor = anothertimeProperties.getWeek().getDayColor();
+        Color weekDaysColor = iconsService.defaultColorIfNull(anothertimeProperties.getWeek().getWeekColor(), Color.darkGray);
+        Color currentDayColor = iconsService.defaultColorIfNull(anothertimeProperties.getWeek().getDayColor());
 
         DayOfWeek firstDay = anothertimeProperties.getWeek().getStartSunday() ? DayOfWeek.SUNDAY : DayOfWeek.MONDAY;
         WeekFields weekFields = WeekFields.of(firstDay, 1);

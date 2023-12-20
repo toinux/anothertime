@@ -14,5 +14,6 @@ RUN chmod +x /entrypoint.sh
 
 VOLUME /data
 WORKDIR /data
+EXPOSE 8080
 
 ENTRYPOINT [ "/entrypoint.sh" ]

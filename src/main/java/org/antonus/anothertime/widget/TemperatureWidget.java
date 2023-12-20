@@ -7,7 +7,6 @@ import org.antonus.anothertime.config.AnothertimeProperties.WidgetsProperties.Te
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.service.IconsService;
 import org.antonus.anothertime.service.SensorService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -18,7 +17,6 @@ import java.util.List;
 import static org.antonus.anothertime.utils.ColorUtils.dimColor;
 
 @Component
-@ConditionalOnProperty(value = "anothertime.widgets.temperature.enabled", matchIfMissing = true)
 @RequiredArgsConstructor
 public class TemperatureWidget implements Widget {
 
@@ -26,6 +24,11 @@ public class TemperatureWidget implements Widget {
     private final IconsService iconsService;
     private final AnothertimeProperties anothertimeProperties;
     public static final String DEFAULT_ICON = "temperaturesmall.gif";
+
+    @Override
+    public Boolean enabled() {
+        return anothertimeProperties.getWidgets().getTemperature().getEnabled();
+    }
 
     @Override
     @SneakyThrows

@@ -12,14 +12,14 @@ import org.springframework.web.service.annotation.PostExchange;
 public interface AwtrixClient {
 
     @PostExchange("/api/custom?name=anothertime")
-    public void sendCustomAnothertime(@RequestBody String payload);
+    void sendCustomAnothertime(@RequestBody String payload);
 
     @GetExchange("/api/stats")
-    public AwtrixStats stats();
+    AwtrixStats stats();
 
     @GetExchange("/api/settings")
-    public AwtrixSettings settings();
+    AwtrixSettings settings();
 
     @GetExchange("/ICONS/{iconName}")
-    public byte[] getIcon(@PathVariable String iconName);
+    byte[] getIcon(@PathVariable String iconName);
 }

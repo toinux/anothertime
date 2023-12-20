@@ -1,0 +1,23 @@
+import {Card, Form} from "react-bootstrap";
+import {FormSelect} from "./FormSelect.jsx";
+import {FormColor} from "./FormColor.jsx";
+
+export function Time({props}) {
+
+     return <Card style={{ width: '18rem' }}>
+      <Card.Body>
+        <Card.Title>Time settings</Card.Title>
+        <Form>
+            <FormSelect defaultValue={props.time.animation} values={['NONE', 'SCROLL', 'FADE']}
+                        label={'Time animation'} propertyName="time.animation"/>
+            <FormSelect defaultValue={props.time.separator} values={['NONE', 'BLINK', 'FADE']}
+                        label={'Separator animation'} propertyName="time.separator"/>
+            <FormColor defaultValue={props.time.hourColor} label={'Hour color'} propertyName="time.hourColor"/>
+            <FormColor defaultValue={props.time.minutesColor} label={'Time color'} propertyName="time.minutesColor"/>
+          <FormColor defaultValue={props.time.separatorColor} label={'Separator color'}
+                     propertyName="time.separatorColor"/>
+        </Form>
+      </Card.Body>
+    </Card>
+
+}

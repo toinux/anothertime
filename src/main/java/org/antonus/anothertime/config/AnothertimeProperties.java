@@ -50,7 +50,7 @@ public class AnothertimeProperties {
         private Boolean startSunday = false;
         private WeekStyle style = WeekStyle.DOTTED2;
         private Color dayColor;
-        private Color weekColor = Color.darkGray;
+        private Color weekColor;
     }
 
 
@@ -60,7 +60,6 @@ public class AnothertimeProperties {
         private CalendarWidgetProperties calendar = new CalendarWidgetProperties();
         private TemperatureWidgetProperties temperature = new TemperatureWidgetProperties();
         private HumidityWidgetProperties humidity = new HumidityWidgetProperties();
-        private Boolean enabled = true;
 
         @Data
         public static class WidgetProperties {
@@ -72,9 +71,9 @@ public class AnothertimeProperties {
         public static class CalendarWidgetProperties extends WidgetProperties {
             private CalendarStyle style = CalendarStyle.ICON;
             private String icon = CalendarWidget.DEFAULT_ICON;
-            private Color headColor = Color.CYAN;
-            private Color bodyColor = Color.WHITE;
-            private Color textColor = Color.BLACK;
+            private Color headColor;
+            private Color bodyColor;
+            private Color textColor;
         }
 
         @Data
