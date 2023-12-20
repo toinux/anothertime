@@ -35,6 +35,7 @@ public class AnothertimeProperties {
     @Data
     public static class SecondsProperties {
         private Color color;
+        private Color backgroundColor;
     }
     @Data
     public static class TimeProperties {

@@ -53,7 +53,7 @@ public record AnothertimePropertiesDto(
 
     }
 
-    public record SecondsProperties(Color color) {
+    public record SecondsProperties(Color color, Color backgroundColor) {
     }
 
 }

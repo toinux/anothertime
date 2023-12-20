@@ -4,7 +4,7 @@ import {FormColor} from "./FormColor.jsx";
 
 export function Time({props}) {
 
-     return <Card style={{ width: '18rem' }}>
+     return <Card className="mb-3">
       <Card.Body>
         <Card.Title>Time settings</Card.Title>
         <Form>
@@ -13,7 +13,7 @@ export function Time({props}) {
             <FormSelect defaultValue={props.time.separator} values={['NONE', 'BLINK', 'FADE']}
                         label={'Separator animation'} propertyName="time.separator"/>
             <FormColor defaultValue={props.time.hourColor} label={'Hour color'} propertyName="time.hourColor"/>
-            <FormColor defaultValue={props.time.minutesColor} label={'Time color'} propertyName="time.minutesColor"/>
+            <FormColor defaultValue={props.time.minutesColor} label={'Minutes color'} propertyName="time.minutesColor"/>
           <FormColor defaultValue={props.time.separatorColor} label={'Separator color'}
                      propertyName="time.separatorColor"/>
         </Form>

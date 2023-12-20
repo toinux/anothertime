@@ -2,6 +2,7 @@ import {Spinner} from "react-bootstrap";
 import {useFetch} from "./hooks/useFetch.js";
 import {Time} from "./components/Time.jsx";
 import {useState} from "react";
+import {Seconds} from "./components/Seconds.jsx";
 
 function App() {
 
@@ -40,7 +41,11 @@ function App() {
         <div className="container">
             <h1>Anothertime settings</h1>
             {loading && <Spinner animation="border"/>}
-            {data && <Time props={data} />}
+            {data && <>
+                <Time props={data} />
+                <Seconds props={data} />
+            </>
+            }
         </div>
     )
 }
