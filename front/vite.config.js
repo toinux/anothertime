@@ -12,7 +12,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/config": "http://localhost:8080"
+      "/config": "http://localhost:8080",
+      "/save": "http://localhost:8080"
     }
   }
 })

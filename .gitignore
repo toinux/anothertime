@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 anothertime.yaml
 data/
+anothertime-settings.json
 
 ### STS ###
 .apt_generated
