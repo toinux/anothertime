@@ -1,43 +1,23 @@
-import {Form} from "react-bootstrap";
+import {Card, Form} from "react-bootstrap";
+import {FormSelect} from "./FormSelect.jsx";
+import {FormColor} from "./FormColor.jsx";
 
-export function Time({time}) {
+export function Time({props}) {
 
-    const handleChange = (e) => {
+     return <Card style={{ width: '18rem' }}>
+      <Card.Body>
+        <Card.Title>Time settings</Card.Title>
+        <Form>
+            <FormSelect defaultValue={props.time.animation} values={['NONE', 'SCROLL', 'FADE']}
+                        label={'Time animation'} propertyName="time.animation"/>
+            <FormSelect defaultValue={props.time.separator} values={['NONE', 'BLINK', 'FADE']}
+                        label={'Separator animation'} propertyName="time.separator"/>
+            <FormColor defaultValue={props.time.hourColor} label={'Hour color'} propertyName="time.hourColor"/>
+            <FormColor defaultValue={props.time.minutesColor} label={'Time color'} propertyName="time.minutesColor"/>
+          <FormColor defaultValue={props.time.separatorColor} label={'Separator color'}
+                     propertyName="time.separatorColor"/>
+        </Form>
+      </Card.Body>
+    </Card>
 
-                fetch("/config", {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    method: "POST",
-                    body: JSON.stringify({
-                        time: {
-                            separator: e.target.value
-                        }
-                    })
-                })
-                    .then(function(res){ console.log(res) })
-                    .catch(function(res){ console.log(res) })
-
-        // setConfig((config) => {
-        //     return {
-        //         ...config,
-        //         time: {
-        //             separator: e.target.value
-        //         }
-        //     }
-        // })
-        console.log(e.target.value)
-    }
-
-    return <Form>
-        <Form.Group className="mb-3" controlId="timeAnimation">
-            <Form.Label>Separator</Form.Label>
-            <Form.Select defaultValue={time.separator} onChange={handleChange}>
-                <option value="NONE">NONE</option>
-                <option value="FADE">FADE</option>
-                <option value="BLINK">BLINK</option>
-            </Form.Select>
-        </Form.Group>
-    </Form>
 }

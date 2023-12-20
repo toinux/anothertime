@@ -38,9 +38,9 @@ function App() {
 
     return (
         <div className="container">
-            <h1>Hello</h1>
+            <h1>Anothertime settings</h1>
             {loading && <Spinner animation="border"/>}
-            {data && <Time time={data.time}/>}
+            {data && <Time props={data} />}
         </div>
     )
 }
