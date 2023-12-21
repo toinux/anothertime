@@ -1,17 +1,26 @@
+import {trackPromise} from "react-promise-tracker";
+import {handleException} from "./handleException.js";
+
 export function updateAnothertime(key, value) {
 
     const payload = createNestedObject(key, value);
 
-    fetch("/config", {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify(payload)
-    }).catch(function (res) {
-            console.log(res)
-    });
+    trackPromise(
+        fetch("/config", {
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            method: "POST",
+            body: JSON.stringify(payload)
+        }).then((r) => {
+          if (r.status !== 200) {
+              handleException("Could not update config", r.statusText);
+          }
+        }).catch(function (e) {
+            handleException("Error", e.toString());
+        })
+    );
 }
 
 const createNestedObject = (keyString, value) => {
