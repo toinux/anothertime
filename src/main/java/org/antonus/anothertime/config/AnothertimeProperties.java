@@ -1,6 +1,7 @@
 package org.antonus.anothertime.config;
 
 import lombok.Data;
+import org.antonus.anothertime.model.Icon;
 import org.antonus.anothertime.types.*;
 import org.antonus.anothertime.widget.CalendarWidget;
 import org.antonus.anothertime.widget.HumidityWidget;
@@ -71,7 +72,7 @@ public class AnothertimeProperties {
         @Data
         public static class CalendarWidgetProperties extends WidgetProperties {
             private CalendarStyle style = CalendarStyle.ICON;
-            private String icon = CalendarWidget.DEFAULT_ICON;
+            private Icon icon = new Icon(CalendarWidget.DEFAULT_ICON);
             private Color headColor;
             private Color bodyColor;
             private Color textColor;
@@ -80,12 +81,12 @@ public class AnothertimeProperties {
         @Data
         public static class TemperatureWidgetProperties extends WidgetProperties {
             private Boolean fahrenheit = false;
-            private String icon = TemperatureWidget.DEFAULT_ICON;
+            private Icon icon = new Icon(TemperatureWidget.DEFAULT_ICON);
         }
 
         @Data
         public static class HumidityWidgetProperties extends WidgetProperties {
-            private String icon = HumidityWidget.DEFAULT_ICON;
+            private Icon icon = new Icon(HumidityWidget.DEFAULT_ICON);
         }
     }
 

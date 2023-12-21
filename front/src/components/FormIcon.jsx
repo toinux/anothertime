@@ -1,29 +1,59 @@
-import {Button, Form, InputGroup} from "react-bootstrap";
-import {useId, useRef} from "react";
+import {Button, Collapse, Form, InputGroup} from "react-bootstrap";
+import {useId, useRef, useState} from "react";
 import {updateAnothertime} from "../lib/updateAnothertime.js";
+import {FaGear} from "react-icons/fa6";
 
 export function FormIcon({label, defaultValue, propertyName}) {
 
     const iconRef = useRef();
+    const [offsetOpen, setOffsetOpen] = useState(false);
+    const [offset, setOffset] = useState({x: defaultValue.x, y: defaultValue.y})
 
     const handleKey = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            updateAnothertime(propertyName, e.target.value);
+            updateAnothertime(propertyName + ".name", e.target.value);
         }
     }
 
-    const handleClick = (e) => {
-        updateAnothertime(propertyName, iconRef.current.value);
+    const handleClick = () => {
+        updateAnothertime(propertyName + ".name", iconRef.current.value);
+    }
+
+    const handleOffsetX = (e) => {
+        setOffset((value) => {
+            const offset = {...value, x: e.target.value};
+            updateAnothertime(propertyName, offset);
+            return offset;
+        });
+    }
+    const handleOffsetY = (e) => {
+        setOffset((value) => {
+            const offset = {...value, y: e.target.value};
+            updateAnothertime(propertyName, offset);
+            return offset;
+        });
     }
 
     const id = useId();
-    return <Form.Group className="mb-3" controlId={id}>
-        <InputGroup>
-            <Form.Label style={{height: "2.5rem"}} className="input-group-text">{label}</Form.Label>
-            <Form.Control ref={iconRef} type="text" style={{height: "2.5rem"}} defaultValue={defaultValue} onKeyDown={handleKey} placeholder={defaultValue}/>
-            <Button style={{height: "2.5rem"}} onClick={handleClick}>Ok</Button>
-        </InputGroup>
-    </Form.Group>
+    return <>
+        <Form.Group className="mb-3" controlId={id}>
+            <InputGroup>
+                <Form.Label style={{height: "2.5rem"}} className="input-group-text">{label}</Form.Label>
+                <Form.Control ref={iconRef} type="text" style={{height: "2.5rem"}} defaultValue={defaultValue.name}
+                              onKeyDown={handleKey} placeholder={defaultValue.name}/>
+                <Button style={{height: "2.5rem"}} onClick={() => setOffsetOpen((value) => !value)}><FaGear /></Button>
+                <Button style={{height: "2.5rem"}} onClick={handleClick}>Ok</Button>
+            </InputGroup>
+        </Form.Group>
+        <Collapse in={offsetOpen}>
+            <div>
+            <Form.Label>X offset : {offset.x}</Form.Label>
+            <Form.Range value={offset.x} min={-32} max={32} step={1} onChange={handleOffsetX}/>
+            <Form.Label>Y offset {offset.y} </Form.Label>
+            <Form.Range value={offset.y} min={-8} max={8} step={1} onChange={handleOffsetY}/>
+            </div>
+        </Collapse>
+    </>
 
 }

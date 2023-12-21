@@ -1,4 +1,4 @@
-import {Form} from "react-bootstrap";
+import {Col, Form, Row} from "react-bootstrap";
 import {useId, useState} from "react";
 import {updateAnothertime} from "../lib/updateAnothertime.js";
 
@@ -19,15 +19,15 @@ export function FormColor({label, defaultValue, propertyName}) {
     }
 
     return <Form.Group className="mb-3" controlId={id}>
-        <div className="row">
-            <div className="col-auto">
+        <Row>
+            <Col xs="auto">
                 <Form.Check type="switch" label={label} checked={checked} onChange={handleCheck}/>
-            </div>
-            <div className="col-auto">
+            </Col>
+            <Col >
                 {checked &&
                     <Form.Control type="color" defaultValue={color} onChange={handleChange}
                                   title="Choose your color"/>}
-            </div>
-        </div>
+            </Col>
+        </Row>
     </Form.Group>
 }

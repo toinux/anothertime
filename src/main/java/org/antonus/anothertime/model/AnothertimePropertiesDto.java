@@ -38,17 +38,17 @@ public record AnothertimePropertiesDto(
                 Boolean enabled,
                 CalendarStyle style,
                 Color color,
-                String icon,
+                Icon icon,
                 Color headColor,
                 Color bodyColor,
                 Color textColor
         ) {
         }
 
-        public record TemperatureWidgetProperties(Boolean enabled, Boolean fahrenheit, String icon, Color color) {
+        public record TemperatureWidgetProperties(Boolean enabled, Boolean fahrenheit, Icon icon, Color color) {
         }
 
-        public record HumidityWidgetProperties(Boolean enabled, String icon, Color color) {
+        public record HumidityWidgetProperties(Boolean enabled, Icon icon, Color color) {
         }
 
     }

@@ -46,7 +46,7 @@ public class CalendarWidget implements Widget {
 
         List<Draw> drawList = new ArrayList<>();
 
-        var calendarIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
+        var calendarIcon = iconsService.getDimmedIcon(properties.getIcon().getName(), DEFAULT_ICON, dim);
 
         boolean hasIcon = null != calendarIcon;
 
@@ -64,7 +64,7 @@ public class CalendarWidget implements Widget {
                     tpos = 29;
                 }
                 if (hasIcon) {
-                    drawList.add(new Bitmap(ipos, offset, 8, 8, calendarIcon));
+                    drawList.add(new Bitmap(ipos + properties.getIcon().getX(), offset + properties.getIcon().getY(), 8, 8, calendarIcon));
                 }
                 drawList.add(new Text(tpos, offset + 1, Integer.toString(currentDay), color));
             }

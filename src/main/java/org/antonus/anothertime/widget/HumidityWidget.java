@@ -43,7 +43,7 @@ public class HumidityWidget implements Widget {
 
         List<Draw> drawList = new ArrayList<>();
 
-        var humidityIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
+        var humidityIcon = iconsService.getDimmedIcon(properties.getIcon().getName(), DEFAULT_ICON, dim);
 
         boolean hasIcon = null != humidityIcon;
 
@@ -57,7 +57,7 @@ public class HumidityWidget implements Widget {
         }
 
         if (hasIcon) {
-            drawList.add(new Bitmap(xpos, offset, 8, 8, humidityIcon));
+            drawList.add(new Bitmap(xpos + properties.getIcon().getX(), offset + properties.getIcon().getY(), 8, 8, humidityIcon));
             xpos += 3;
         }
 

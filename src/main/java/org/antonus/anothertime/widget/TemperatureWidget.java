@@ -43,7 +43,7 @@ public class TemperatureWidget implements Widget {
         TemperatureWidgetProperties properties = anothertimeProperties.getWidgets().getTemperature();
         Color color = dimColor(iconsService.defaultColorIfNull(properties.getColor()), dim);
 
-        var temperatureIcon = iconsService.getDimmedIcon(properties.getIcon(), DEFAULT_ICON, dim);
+        var temperatureIcon = iconsService.getDimmedIcon(properties.getIcon().getName(), DEFAULT_ICON, dim);
 
         boolean hasIcon = null != temperatureIcon;
 
@@ -66,7 +66,7 @@ public class TemperatureWidget implements Widget {
         }
 
         if (hasIcon && !tooLarge) {
-            drawList.add(new Bitmap(tempNegative ? (temp > 9 ? xpos - 1 : xpos - 3) : xpos, offset, 8, 8, temperatureIcon));
+            drawList.add(new Bitmap((tempNegative ? (temp > 9 ? xpos - 1 : xpos - 3) : xpos) + properties.getIcon().getX(), offset + properties.getIcon().getY(), 8, 8, temperatureIcon));
             xpos += 3;
         }
 
