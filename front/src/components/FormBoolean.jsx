@@ -1,6 +1,6 @@
 import {Form} from "react-bootstrap";
 import {useId, useState} from "react";
-import {updateAnothertime} from "../lib/updateAnothertime.js";
+import {updateAnothertime} from "@/lib/updateAnothertime.js";
 
 export function FormBoolean({label, defaultValue, propertyName}) {
     const id = useId();

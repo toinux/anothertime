@@ -1,5 +1,5 @@
 import {trackPromise} from "react-promise-tracker";
-import {handleException} from "./handleException.js";
+import {handleException} from "@/lib/handleException.js";
 
 export function updateAnothertime(key, value) {
 

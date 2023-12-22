@@ -1,6 +1,6 @@
 import {Form} from "react-bootstrap";
-import {FormSelect} from "./FormSelect.jsx";
-import {SettingsContainer} from "./SettingsContainer.jsx";
+import {FormSelect} from "@/components/FormSelect.jsx";
+import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 
 export function Widgets({props}) {
 

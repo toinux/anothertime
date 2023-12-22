@@ -1,6 +1,6 @@
 import {Form, InputGroup} from "react-bootstrap";
 import {useId} from "react";
-import {updateAnothertime} from "../lib/updateAnothertime.js";
+import {updateAnothertime} from "@/lib/updateAnothertime.js";
 
 export function FormSelect({label, defaultValue, values, propertyName}) {
     const handleChange = (e) => {

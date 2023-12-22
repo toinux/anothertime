@@ -1,6 +1,6 @@
 import {Form} from "react-bootstrap";
-import {FormColor} from "./FormColor.jsx";
-import {SettingsContainer} from "./SettingsContainer.jsx";
+import {FormColor} from "@/components/FormColor.jsx";
+import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 
 export function Seconds({props}) {
 

@@ -1,7 +1,8 @@
 import {Button, Collapse, Form, InputGroup} from "react-bootstrap";
 import {useId, useRef, useState} from "react";
-import {updateAnothertime} from "../lib/updateAnothertime.js";
+import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {FaGear} from "react-icons/fa6";
+import debounce from "debounce";
 
 export function FormIcon({label, defaultValue, propertyName}) {
 
@@ -20,20 +21,20 @@ export function FormIcon({label, defaultValue, propertyName}) {
         updateAnothertime(propertyName + ".name", iconRef.current.value);
     }
 
-    const handleOffsetX = (e) => {
+    const handleOffsetX = debounce((e) => {
         setOffset((value) => {
             const offset = {...value, x: e.target.value};
             updateAnothertime(propertyName, offset);
             return offset;
         });
-    }
-    const handleOffsetY = (e) => {
+    }, 100);
+    const handleOffsetY = debounce((e) => {
         setOffset((value) => {
             const offset = {...value, y: e.target.value};
             updateAnothertime(propertyName, offset);
             return offset;
         });
-    }
+    }, 100);
 
     const id = useId();
     return <>
@@ -49,9 +50,9 @@ export function FormIcon({label, defaultValue, propertyName}) {
         <Collapse in={offsetOpen}>
             <div>
             <Form.Label>X offset : {offset.x}</Form.Label>
-            <Form.Range value={offset.x} min={-32} max={32} step={1} onChange={handleOffsetX}/>
+            <Form.Range defaultValue={offset.x} min={-32} max={32} step={1} onChange={handleOffsetX}/>
             <Form.Label>Y offset {offset.y} </Form.Label>
-            <Form.Range value={offset.y} min={-8} max={8} step={1} onChange={handleOffsetY}/>
+            <Form.Range defaultValue={offset.y} min={-8} max={8} step={1} onChange={handleOffsetY}/>
             </div>
         </Collapse>
     </>

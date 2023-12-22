@@ -1,7 +1,7 @@
 import {Form} from "react-bootstrap";
-import {FormSelect} from "./FormSelect.jsx";
-import {FormColor} from "./FormColor.jsx";
-import {SettingsContainer} from "./SettingsContainer.jsx";
+import {FormSelect} from "@/components/FormSelect.jsx";
+import {FormColor} from "@/components/FormColor.jsx";
+import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 
 export function Time({props}) {
 

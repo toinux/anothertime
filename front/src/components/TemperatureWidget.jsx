@@ -1,8 +1,8 @@
 import {Form} from "react-bootstrap";
-import {FormColor} from "./FormColor.jsx";
-import {SettingsContainer} from "./SettingsContainer.jsx";
-import {FormBoolean} from "./FormBoolean.jsx";
-import {FormIcon} from "./FormIcon.jsx";
+import {FormColor} from "@/components/FormColor.jsx";
+import {SettingsContainer} from "@/components/SettingsContainer.jsx";
+import {FormBoolean} from "@/components/FormBoolean.jsx";
+import {FormIcon} from "@/components/FormIcon.jsx";
 
 export function TemperatureWidget({props}) {
 

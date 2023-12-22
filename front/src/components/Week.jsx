@@ -1,8 +1,8 @@
 import {Form} from "react-bootstrap";
-import {FormSelect} from "./FormSelect.jsx";
-import {FormColor} from "./FormColor.jsx";
-import {SettingsContainer} from "./SettingsContainer.jsx";
-import {FormBoolean} from "./FormBoolean.jsx";
+import {FormSelect} from "@/components/FormSelect.jsx";
+import {FormColor} from "@/components/FormColor.jsx";
+import {SettingsContainer} from "@/components/SettingsContainer.jsx";
+import {FormBoolean} from "@/components/FormBoolean.jsx";
 
 export function Week({props}) {
 
