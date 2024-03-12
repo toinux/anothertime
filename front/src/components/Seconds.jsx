@@ -1,8 +1,12 @@
 import {Form} from "react-bootstrap";
 import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
+import configStore from "@/store/configStore.js";
 
-export function Seconds({props}) {
+export function Seconds() {
+
+
+    const props = configStore((state) => state.config);
 
      return <SettingsContainer title = "Seconds">
         <Form>

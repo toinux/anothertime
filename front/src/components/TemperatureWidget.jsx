@@ -3,8 +3,11 @@ import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 import {FormBoolean} from "@/components/FormBoolean.jsx";
 import {FormIcon} from "@/components/FormIcon.jsx";
+import configStore from "@/store/configStore.js";
 
-export function TemperatureWidget({props}) {
+export function TemperatureWidget() {
+
+    const props = configStore((state) => state.config);
 
      return <SettingsContainer title="Temperature widget">
         <Form>
