@@ -1,37 +1,24 @@
 import {Container, Navbar} from "react-bootstrap";
-import {Time} from "./components/Time.jsx";
-import {Week} from "./components/Week.jsx";
-import {Seconds} from "./components/Seconds.jsx";
-import {Widgets} from "./components/Widgets.jsx";
-import {CalendarWidget} from "./components/CalendarWidget.jsx";
-import {TemperatureWidget} from "./components/TemperatureWidget.jsx";
-import {HumidityWidget} from "./components/HumidityWidget.jsx";
-import {SaveButton} from "./components/SaveButton.jsx";
-import {trackPromise} from "react-promise-tracker";
-import {useEffect, useState} from "react";
-import {handleException} from "./lib/handleException.js";
+import {Time} from "@/components/Time.jsx";
+import {Week} from "@/components/Week.jsx";
+import {Seconds} from "@/components/Seconds.jsx";
+import {Widgets} from "@/components/Widgets.jsx";
+import {CalendarWidget} from "@/components/CalendarWidget.jsx";
+import {TemperatureWidget} from "@/components/TemperatureWidget.jsx";
+import {HumidityWidget} from "@/components/HumidityWidget.jsx";
+import {SaveButton} from "@/components/SaveButton.jsx";
+import {useEffect} from "react";
 import {ToastContainer} from "react-toastify";
-import {TrackedSpinner} from "./components/TrackedSpinner.jsx";
+import {TrackedSpinner} from "@/components/TrackedSpinner.jsx";
+import configStore from "@/store/configStore.js";
+import {useShallow} from "zustand/react/shallow";
 
 function App() {
 
-    const [data, setData] = useState(null);
+    const [config, fetchConfig] = configStore(useShallow((state) => [state.config, state.fetchConfig]));
 
     useEffect(() => {
-        trackPromise(
-            fetch("/config")
-                .then(r => {
-                    if (r.status !== 200) {
-                        handleException("fetch /config", r.statusText);
-                        return null;
-                    }
-                    return r.json();
-                })
-                .then(setData)
-                .catch(e => {
-                    handleException("Error", e.toString());
-                })
-        );
+        fetchConfig();
     }, []);
 
     return (
@@ -53,19 +40,19 @@ function App() {
                     <Navbar.Brand><h1>Anothertime</h1></Navbar.Brand>
                     <div className="d-flex justify-content-end">
                         <TrackedSpinner />
-                        {data && <SaveButton />}
+                        {config && <SaveButton />}
                     </div>
                 </Container>
 
             </Navbar>
-            {data && <>
-                <Time props={data}/>
-                <Seconds props={data}/>
-                <Week props={data}/>
-                <Widgets props={data}/>
-                <CalendarWidget props={data}/>
-                <TemperatureWidget props={data}/>
-                <HumidityWidget props={data}/>
+            {config && <>
+                <Time/>
+                <Seconds/>
+                <Week/>
+                <Widgets/>
+                <CalendarWidget/>
+                <TemperatureWidget/>
+                <HumidityWidget/>
             </>
             }
         </Container>

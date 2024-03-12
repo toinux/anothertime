@@ -1,11 +1,7 @@
-import com.github.gradle.node.yarn.task.YarnInstallTask
-import com.github.gradle.node.yarn.task.YarnTask
-
 plugins {
     java
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.3"
     id("io.spring.dependency-management") version "1.1.4"
-    id("com.github.node-gradle.node") version "7.0.1"
 }
 
 group = "org.antonus"
@@ -50,27 +46,7 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.npmInstall {
-    enabled=false
-}
-
-tasks.named<YarnInstallTask>(YarnInstallTask.NAME){
-    workingDir = file("${project.projectDir}/front")
-    ignoreExitValue.set(true)
-}
-
-val yarnBuild = tasks.register<YarnTask>("yarnBuild") {
-    dependsOn(YarnInstallTask.NAME)
-    workingDir = file("${project.projectDir}/front")
-    args.set(listOf("build"))
-    inputs.dir(fileTree("front/src").exclude("**/*.test.js").exclude("**/*.spec.js").exclude("**/__tests__/**/*.js"))
-    inputs.dir("front/node_modules")
-    outputs.dir("front/dist")
-}
-
-
 val copyReact = tasks.register<Copy>("copyReact") {
-    dependsOn(yarnBuild)
     from("front/dist")
     into("build/resources/main/static/")
 }

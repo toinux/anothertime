@@ -7,10 +7,7 @@
 
 name: Gradle Package
 
-on:
-  push:
-    tags:
-      - "v*.*.*"
+on: push
 
 jobs:
   build:
@@ -21,27 +18,42 @@ jobs:
       packages: write
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK 21
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
+        cache: 'gradle'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
+    - uses: pnpm/action-setup@v3
+      with:
+        version: 8
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
-        node-version: '21.4.0'
-        cache: 'yarn'
-        cache-dependency-path: front/yarn.lock
+        node-version: '21'
+        cache: 'pnpm'
+        cache-dependency-path: ./front/pnpm-lock.yaml
+    - name: Install pnpm dependencies
+      working-directory: ./front
+      run: pnpm install
+    - name: Build front
+      working-directory: ./front
+      run: pnpm build
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
+      run: ./gradlew bootJar
+    - uses: actions/upload-artifact@v4
       with:
-        arguments: bootJar
+        name: anothertime
+        path: build/libs/*.jar
 
     - name: GH Release
-      uses: softprops/action-gh-release@v0.1.15
+      uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
           build/libs/*.jar

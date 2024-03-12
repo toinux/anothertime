@@ -2,8 +2,11 @@ import {Form} from "react-bootstrap";
 import {FormSelect} from "@/components/FormSelect.jsx";
 import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
+import configStore from "@/store/configStore.js";
 
-export function Time({props}) {
+export function Time() {
+
+    const props = configStore((state) => state.config);
 
      return <SettingsContainer title="Time">
          <Form>
