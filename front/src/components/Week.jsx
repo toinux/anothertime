@@ -3,11 +3,11 @@ import {FormSelect} from "@/components/FormSelect.jsx";
 import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 import {FormBoolean} from "@/components/FormBoolean.jsx";
-import configStore from "@/store/configStore.js";
+import useConfig from "@/hooks/useConfig.js";
 
 export function Week() {
 
-    const props = configStore((state) => state.config);
+    const {data: props} = useConfig();
 
      return <SettingsContainer title="Week">
         <Form>

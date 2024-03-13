@@ -1,11 +1,11 @@
 import {Form} from "react-bootstrap";
 import {FormSelect} from "@/components/FormSelect.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
-import configStore from "@/store/configStore.js";
+import useConfig from "@/hooks/useConfig.js";
 
 export function Widgets() {
 
-    const props = configStore((state) => state.config);
+    const {data: props} = useConfig();
 
      return <SettingsContainer title="Widgets">
         <Form>

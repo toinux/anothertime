@@ -5,7 +5,7 @@ import {toast} from "react-toastify";
 
 export function SaveButton() {
 
-    const handleClick = (e) => {
+    const handleClick = () => {
 
         async function promise() {
             const response = await fetch("/save", {

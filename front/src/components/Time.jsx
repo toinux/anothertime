@@ -2,21 +2,22 @@ import {Form} from "react-bootstrap";
 import {FormSelect} from "@/components/FormSelect.jsx";
 import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
-import configStore from "@/store/configStore.js";
+import useConfig from "@/hooks/useConfig.js";
 
 export function Time() {
 
-    const props = configStore((state) => state.config);
+    const {data} = useConfig();
+    const {time} = data;
 
      return <SettingsContainer title="Time">
          <Form>
-            <FormSelect defaultValue={props.time.animation} values={['NONE', 'SCROLL', 'FADE']}
+            <FormSelect defaultValue={time.animation} values={['NONE', 'SCROLL', 'FADE']}
                         label={'Time animation'} propertyName="time.animation"/>
-            <FormSelect defaultValue={props.time.separator} values={['NONE', 'BLINK', 'FADE']}
+            <FormSelect defaultValue={time.separator} values={['NONE', 'BLINK', 'FADE']}
                         label={'Separator animation'} propertyName="time.separator"/>
-            <FormColor defaultValue={props.time.hourColor} label={'Hour color'} propertyName="time.hourColor"/>
-            <FormColor defaultValue={props.time.minutesColor} label={'Minutes color'} propertyName="time.minutesColor"/>
-          <FormColor defaultValue={props.time.separatorColor} label={'Separator color'}
+            <FormColor defaultValue={time.hourColor} label={'Hour color'} propertyName="time.hourColor"/>
+            <FormColor defaultValue={time.minutesColor} label={'Minutes color'} propertyName="time.minutesColor"/>
+          <FormColor defaultValue={time.separatorColor} label={'Separator color'}
                      propertyName="time.separatorColor"/>
         </Form>
 </SettingsContainer>

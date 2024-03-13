@@ -3,11 +3,11 @@ import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
 import {FormBoolean} from "@/components/FormBoolean.jsx";
 import {FormIcon} from "@/components/FormIcon.jsx";
-import configStore from "@/store/configStore.js";
+import useConfig from "@/hooks/useConfig.js";
 
 export function HumidityWidget() {
 
-    const props = configStore((state) => state.config);
+    const {data: props} = useConfig();
 
      return <SettingsContainer title="Humidity widget">
         <Form>
