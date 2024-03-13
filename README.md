@@ -1,4 +1,5 @@
 # anothertime
+[![Gradle Package](https://github.com/toinux/anothertime/actions/workflows/gradle-release.yml/badge.svg)](https://github.com/toinux/anothertime/actions/workflows/gradle-release.yml)
 
 # Run with docker
 
