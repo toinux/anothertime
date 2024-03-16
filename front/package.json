@@ -1,5 +1,5 @@
 {
-  "name": "front2",
+  "name": "front",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,28 +10,44 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "@tanstack/react-query": "^5.27.5",
-    "@tanstack/react-query-devtools": "^5.27.8",
-    "bootstrap": "^5.3.3",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-collapsible": "^1.0.3",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slider": "^1.1.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@tanstack/react-query": "^5.28.4",
+    "@tanstack/react-query-devtools": "^5.28.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
     "debounce": "^2.0.0",
+    "immer": "^10.0.4",
+    "lucide-react": "^0.357.0",
     "react": "^18.2.0",
-    "react-bootstrap": "^2.10.1",
     "react-colorful": "^5.6.1",
     "react-dom": "^18.2.0",
     "react-icons": "^4.12.0",
     "react-promise-tracker": "^2.1.1",
-    "react-toastify": "^9.1.3"
+    "react-toastify": "^9.1.3",
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7",
+    "use-immer": "^0.9.0"
   },
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.27.7",
-    "@types/react": "^18.2.64",
-    "@types/react-dom": "^18.2.21",
+    "@types/node": "^20.11.28",
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
     "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.18",
     "eslint": "^8.57.0",
-    "eslint-plugin-react": "^7.34.0",
+    "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "vite": "^5.1.5"
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.1.6"
   }
 }

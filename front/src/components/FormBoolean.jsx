@@ -1,18 +1,21 @@
-import {Form} from "react-bootstrap";
 import {useId, useState} from "react";
 import {updateAnothertime} from "@/lib/updateAnothertime.js";
+import {Switch} from "@/components/ui/switch.jsx";
+import {Label} from "@/components/ui/label.jsx";
 
 export function FormBoolean({label, defaultValue, propertyName}) {
     const id = useId();
 
     const [checked, setChecked] = useState(defaultValue);
 
-    const handleCheck = (e) => {
-        updateAnothertime(propertyName, e.target.checked);
-        setChecked(e.target.checked);
+    const handleCheck = (checked) => {
+        updateAnothertime(propertyName, checked);
+        setChecked(checked);
     }
 
-    return <Form.Group className="mb-3" controlId={id}>
-        <Form.Check type="switch" label={label} checked={checked} onChange={handleCheck}/>
-    </Form.Group>
+    return <div className="flex items-center space-x-2">
+        <Switch id={id} checked={checked} onCheckedChange={handleCheck}/>
+        <Label htmlFor={id}>{label}</Label>
+    </div>
+
 }

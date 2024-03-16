@@ -1,4 +1,3 @@
-import {Container, Navbar} from "react-bootstrap";
 import {Time} from "@/components/Time.jsx";
 import {Week} from "@/components/Week.jsx";
 import {Seconds} from "@/components/Seconds.jsx";
@@ -14,28 +13,31 @@ export default function Home() {
 
     const {data: config} = useConfig();
 
-    return (
-        <Container>
-            <Navbar sticky="top" bg="dark" data-bs-theme="dark" className="mb-3">
-                <Container>
-                    <Navbar.Brand><h1>Anothertime</h1></Navbar.Brand>
-                    <div className="d-flex justify-content-end">
-                        <TrackedSpinner/>
-                        {config && <SaveButton/>}
-                    </div>
-                </Container>
+    return <>
+        <nav
+            className="justify-between px-4 py-3 text-gray-700 border border-gray-200 rounded-lg sm:flex sm:px-5 bg-gray-50 dark:bg-gray-800 dark:border-gray-700">
+            <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <h1>Anothertime</h1>
+            </div>
+            <div className="w-full md:block md:w-auto">
+                <TrackedSpinner/>
+                {config && <SaveButton/>}
+            </div>
+        </nav>
 
-            </Navbar>
-            {config && <>
-                <Time/>
-                <Seconds/>
-                <Week/>
-                <Widgets/>
-                <CalendarWidget/>
-                <TemperatureWidget/>
-                <HumidityWidget/>
-            </>
+
+        <div className="container mx-auto px-4 mt-8">
+            {
+                config && <>
+                    <Time/>
+                    <Seconds/>
+                    <Week/>
+                    <Widgets/>
+                    <CalendarWidget/>
+                    <TemperatureWidget/>
+                    <HumidityWidget/>
+                </>
             }
-        </Container>
-    )
+        </div>
+    </>;
 }

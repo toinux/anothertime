@@ -1,12 +1,10 @@
-import {Card} from "react-bootstrap";
+import {Card, CardContent, CardHeader} from "@/components/ui/card.jsx";
 
 export function SettingsContainer({title, children}) {
 
-    return <Card className="mb-3">
-        <Card.Body>
-            <Card.Title>{title}</Card.Title>
-            {children}
-        </Card.Body>
+    return <Card>
+        <CardHeader>{title}</CardHeader>
+        <CardContent>{children}</CardContent>
     </Card>
 
 }

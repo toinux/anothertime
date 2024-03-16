@@ -1,24 +1,29 @@
-import {Form, InputGroup} from "react-bootstrap";
 import {useId} from "react";
 import {updateAnothertime} from "@/lib/updateAnothertime.js";
+import {Label} from "@/components/ui/label.jsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 
 export function FormSelect({label, defaultValue, values, propertyName}) {
-    const handleChange = (e) => {
-        updateAnothertime(propertyName, e.target.value);
+    const handleChange = (value) => {
+        updateAnothertime(propertyName, value);
     }
 
     const id = useId();
-    return <Form.Group className="mb-3" controlId={id}>
-        <InputGroup>
-            <Form.Label style={{height: "2.5rem"}} className="input-group-text">{label}</Form.Label>
-            <Form.Select style={{height: "2.5rem"}} defaultValue={defaultValue} onChange={handleChange}>
+
+    return <>
+        <Label htmlFor={id}>{label}</Label>
+        <Select defaultValue={defaultValue} onValueChange={handleChange}>
+            <SelectTrigger id={id}>
+                <SelectValue placeholder={label}/>
+            </SelectTrigger>
+            <SelectContent>
                 {
                     values.map(o => {
-                        return (<option key={o} value={o}>{o}</option>)
+                        return (<SelectItem key={o} value={o}>{o}</SelectItem>)
                     })
                 }
-            </Form.Select>
-        </InputGroup>
-    </Form.Group>
+            </SelectContent>
+        </Select>
+    </>;
 
 }

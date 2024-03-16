@@ -1,8 +1,11 @@
-import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 import {useId, useMemo, useState} from "react";
 import {HexColorInput, HexColorPicker} from "react-colorful";
 import debounce from "debounce";
 import {updateAnothertime} from "@/lib/updateAnothertime.js";
+import {Button} from "@/components/ui/button.jsx";
+import {Checkbox} from "@/components/ui/checkbox.jsx";
+import {Label} from "@/components/ui/label.jsx";
+import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from "@/components/ui/popover.jsx";
 
 export function FormColor({label, defaultValue, propertyName}) {
     const id = useId();
@@ -10,11 +13,10 @@ export function FormColor({label, defaultValue, propertyName}) {
     const [checked, setChecked] = useState(defaultValue !== null);
     const [color, setColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
     const [previousColor, setPreviousColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
-    const [showColorPicker, setShowColorPicker] = useState(false);
 
-    const handleCheck = (e) => {
-        updateAnothertime(propertyName, e.target.checked ? color : "default");
-        setChecked(e.target.checked);
+    const handleCheck = (checked) => {
+        updateAnothertime(propertyName, checked ? color : "default");
+        setChecked(checked);
     }
 
     const handleChange = debounce((color) => {
@@ -22,25 +24,25 @@ export function FormColor({label, defaultValue, propertyName}) {
         updateAnothertime(propertyName, color);
     }, 100);
 
-    const handleClick = (e) => {
-        e.preventDefault();
+    const handleClick = () => {
+        //e.preventDefault();
+        console.log("setPreviousColor");
         setPreviousColor(color);
-        setShowColorPicker((show) => !show);
     }
 
-    const handleClose = () => setShowColorPicker(false);
     const handleSave = () => {
+        console.log("save");
         if (color !== previousColor) {
+            setPreviousColor(color);
             updateAnothertime(propertyName, color);
         }
-        handleClose();
     }
     const handleCancel = () => {
+        console.log("cancel");
         if (color !== previousColor) {
             setColor(previousColor);
             updateAnothertime(propertyName, previousColor);
         }
-        handleClose();
     }
 
     const colorList = useMemo(() => {
@@ -52,50 +54,53 @@ export function FormColor({label, defaultValue, propertyName}) {
 
         return presetColors.map((presetColor) => (
 
-            <Button className="col-1 m-1 p-0"
-                    variant="outline-secondary"
-                    key={presetColor}
-                    style={{
-                        background: presetColor,
-                        width: "1.5rem",
-                        height: "1.5rem"
-                    }}
+            <div key={presetColor}
+                    style={{ background: presetColor }}
+                    className={"rounded-md size-6 cursor-pointer active:scale-105"}
                     onClick={() => handleChange(presetColor)}
             />
         ))
     }, [handleChange]);
 
-    return <Form.Group className="mb-3" controlId={id}>
-        <Row>
-            <Col xs="auto">
-                <Form.Check type="switch" label={label} checked={checked} onChange={handleCheck}/>
-            </Col>
-            <Col>
+    return <>
+                <Checkbox id={id} label={label} checked={checked} onCheckedChange={handleCheck}/>
+                <Label htmlFor={id}>{label}</Label>
                 {checked &&
-                    <Form.Control type="color" value={color} readOnly={true}
-                                  onClick={handleClick}
-                                  title="Choose your color"/>}
-            </Col>
-        </Row>
-        <Modal show={showColorPicker} onHide={handleClose} size="sm" centered>
-            <Modal.Header closeButton>
-            </Modal.Header>
-            <Modal.Body>
-                <HexColorPicker style={{width: "100%"}} className="mb-3" color={color} onChange={handleChange}/>
-                <Row className="mb-3 px-3">
-                    {colorList}
-                </Row>
-                <HexColorInput className="form-control" color={color} onChange={handleChange} prefixed={true}/>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleCancel}>
-                    Cancel
-                </Button>
-                <Button variant="primary" onClick={handleSave}>
-                    Ok
-                </Button>
-            </Modal.Footer>
+                    <Popover>
+                        <PopoverTrigger asChild={true}>
+                            <div style={{
+                                background: color
+                            }}
+                                    className={"rounded-md size-6 cursor-pointer active:scale-105 border"}
+                                    onClick={handleClick}
+                                    title="Choose your color"
+                            />
+                        </PopoverTrigger>
+                        <PopoverContent onPointerDownOutside={handleCancel} onEscapeKeyDown={handleCancel} className={"w-96"}>
+                            <div>
+                                <HexColorPicker className={"min-w-full"} color={color} onChange={handleChange}/>
+                                <div className={"w-96 flex flex-wrap gap-1 mt-0"}>
+                                    {colorList}
+                                </div>
+                                <HexColorInput color={color} onChange={handleChange} prefixed={true}/>
+                            </div>
+                            <div>
+                                <PopoverClose asChild={true}>
+                                    <div>
+                                        <Button variant="secondary" onClick={handleCancel}>
+                                            Cancel
+                                        </Button>
+                                        <Button onClick={handleSave}>
+                                            Apply
+                                        </Button>
+                                    </div>
+                                </PopoverClose>
 
-        </Modal>
-    </Form.Group>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+
+                }
+
+    </>
 }

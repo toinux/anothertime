@@ -1,7 +1,7 @@
-import {Button} from "react-bootstrap";
 import {FaSave} from "react-icons/fa";
 import {trackPromise} from "react-promise-tracker";
 import {toast} from "react-toastify";
+import {Button} from "@/components/ui/button.jsx";
 
 export function SaveButton() {
 
@@ -28,6 +28,6 @@ export function SaveButton() {
 
     }
 
-    return <Button variant="primary" onClick={handleClick}><FaSave/> Save</Button>
+    return <Button onClick={handleClick}><FaSave/> Save</Button>
 
 }

@@ -1,14 +1,20 @@
-import {Button, Collapse, Form, InputGroup} from "react-bootstrap";
-import {useId, useRef, useState} from "react";
+import {useId, useRef} from "react";
 import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {FaGear} from "react-icons/fa6";
 import debounce from "debounce";
+import {Label} from "@/components/ui/label.jsx";
+import {Button} from "@/components/ui/button.jsx";
+import {Input} from "@/components/ui/input.jsx";
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
+import {Slider} from "@/components/ui/slider.jsx";
+import {useImmer} from "use-immer";
 
 export function FormIcon({label, defaultValue, propertyName}) {
 
     const iconRef = useRef();
-    const [offsetOpen, setOffsetOpen] = useState(false);
-    const [offset, setOffset] = useState({x: defaultValue.x, y: defaultValue.y})
+    const [offset, setOffset] = useImmer({x: defaultValue.x, y: defaultValue.y})
+    const xId = useId();
+    const yId = useId();
 
     const handleKey = (e) => {
         if (e.key === 'Enter') {
@@ -21,40 +27,37 @@ export function FormIcon({label, defaultValue, propertyName}) {
         updateAnothertime(propertyName + ".name", iconRef.current.value);
     }
 
-    const handleOffsetX = debounce((e) => {
-        setOffset((value) => {
-            const offset = {...value, x: e.target.value};
-            updateAnothertime(propertyName, offset);
-            return offset;
-        });
-    }, 100);
-    const handleOffsetY = debounce((e) => {
-        setOffset((value) => {
-            const offset = {...value, y: e.target.value};
-            updateAnothertime(propertyName, offset);
-            return offset;
-        });
-    }, 100);
+    const handleOffsetX = debounce((value) =>
+        setOffset((draft) => {
+            draft.x = value[0];
+            updateAnothertime(propertyName, draft);
+        }), 100);
+    const handleOffsetY = debounce((value) =>
+        setOffset((draft) => {
+            draft.y = value[0];
+            updateAnothertime(propertyName, draft);
+        }), 100);
 
     const id = useId();
     return <>
-        <Form.Group className="mb-3" controlId={id}>
-            <InputGroup>
-                <Form.Label style={{height: "2.5rem"}} className="input-group-text">{label}</Form.Label>
-                <Form.Control ref={iconRef} type="text" style={{height: "2.5rem"}} defaultValue={defaultValue.name}
-                              onKeyDown={handleKey} placeholder={defaultValue.name}/>
-                <Button style={{height: "2.5rem"}} onClick={() => setOffsetOpen((value) => !value)}><FaGear /></Button>
-                <Button style={{height: "2.5rem"}} onClick={handleClick}>Ok</Button>
-            </InputGroup>
-        </Form.Group>
-        <Collapse in={offsetOpen}>
-            <div>
-            <Form.Label>X offset : {offset.x}</Form.Label>
-            <Form.Range defaultValue={offset.x} min={-32} max={32} step={1} onChange={handleOffsetX}/>
-            <Form.Label>Y offset {offset.y} </Form.Label>
-            <Form.Range defaultValue={offset.y} min={-8} max={8} step={1} onChange={handleOffsetY}/>
-            </div>
-        </Collapse>
+                <Label htmlFor={id}>{label}</Label>
+                <Input type="text" ref={iconRef} id={id} placeholder={defaultValue.name} defaultValue={defaultValue.name} onKeyDown={handleKey} />
+
+
+        <Collapsible>
+            <CollapsibleTrigger asChild={true}>
+                <Button style={{height: "2.5rem"}}><FaGear /></Button>
+            </CollapsibleTrigger>
+            <Button style={{height: "2.5rem"}} onClick={handleClick}>Ok</Button>
+            <CollapsibleContent className={'overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'}>
+                <div>
+                    <Label htmlFor={xId}>X offset : {offset.x}</Label>
+                    <Slider id={xId} defaultValue={[offset.x]} min={-32} max={32} step={1} onValueChange={handleOffsetX}/>
+                    <Label htmlFor={yId}>Y offset {offset.y}</Label>
+                    <Slider id={yId} defaultValue={[offset.y]} min={-8} max={8} step={1} onValueChange={handleOffsetY}/>
+                </div>
+            </CollapsibleContent>
+        </Collapsible>
     </>
 
 }
