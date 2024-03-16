@@ -10,20 +10,24 @@ export function FormSelect({label, defaultValue, values, propertyName}) {
 
     const id = useId();
 
-    return <>
-        <Label htmlFor={id}>{label}</Label>
-        <Select defaultValue={defaultValue} onValueChange={handleChange}>
-            <SelectTrigger id={id}>
-                <SelectValue placeholder={label}/>
-            </SelectTrigger>
-            <SelectContent>
-                {
-                    values.map(o => {
-                        return (<SelectItem key={o} value={o}>{o}</SelectItem>)
-                    })
-                }
-            </SelectContent>
-        </Select>
-    </>;
+    return <div className={"flex mb-4"}>
+        <div className={"p-1.5 w-48 bg-accent rounded-tl-md rounded-bl-md border border-r-0"}>
+            <Label className={"text-base"} htmlFor={id}>{label}</Label>
+        </div>
+        <div className={"grow"}>
+            <Select defaultValue={defaultValue} onValueChange={handleChange}>
+                <SelectTrigger className={"rounded-tl-none rounded-bl-none"} id={id}>
+                    <SelectValue placeholder={label}/>
+                </SelectTrigger>
+                <SelectContent>
+                    {
+                        values.map(o => {
+                            return (<SelectItem key={o} value={o}>{o}</SelectItem>)
+                        })
+                    }
+                </SelectContent>
+            </Select>
+        </div>
+    </div>;
 
 }
