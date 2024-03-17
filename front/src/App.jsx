@@ -2,6 +2,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import Home from "@/pages/Home.jsx";
 import {ToastContainer} from "react-toastify";
+import ToastCloseButton from "@/components/ToastCloseButton.jsx";
 
 function App() {
 
@@ -12,6 +13,7 @@ function App() {
             <ToastContainer
                 position="bottom-center"
                 autoClose={2000}
+                closeButton={ToastCloseButton}
                 hideProgressBar={false}
                 newestOnTop={false}
                 closeOnClick

@@ -33,6 +33,13 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.5rem;
+
+    --toastify-color-light: hsl(var(--primary));
+    --toastify-color-success: hsl(var(--primary));
+    --toastify-text-color-success: hsl(var(--primary-foreground));
+    --toastify-text-color-info: hsl(var(--secondary-foreground));
+    --toastify-text-color-error: hsl(var(--destructive-foreground));
+
   }
 
   .dark {
