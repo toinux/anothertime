@@ -1,11 +1,12 @@
-import {usePromiseTracker} from "react-promise-tracker";
 import {Spinner} from "@/components/Spinner.jsx";
+import {useIsFetching, useIsMutating} from "@tanstack/react-query";
 
-export function TrackedSpinner() {
+export function TrackedSpinner({className}) {
 
-    const {promiseInProgress} = usePromiseTracker();
+    const isMutating = useIsMutating();
+    const isFetching = useIsFetching();
 
     return <>
-        {promiseInProgress && <Spinner />}
+        {(isMutating > 0 || isFetching > 0) && <Spinner className={className}/>}
     </>
 }

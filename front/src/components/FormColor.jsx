@@ -1,11 +1,11 @@
 import {useId, useMemo, useState} from "react";
 import {HexColorInput, HexColorPicker} from "react-colorful";
 import debounce from "debounce";
-import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {Button} from "@/components/ui/button.jsx";
 import {Label} from "@/components/ui/label.jsx";
 import {Switch} from "@/components/ui/switch.jsx";
 import {Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger} from "@/components/ui/dialog.jsx";
+import {useConfigMutation} from "@/hooks/useConfig.js";
 
 export function FormColor({label, defaultValue, propertyName}) {
     const id = useId();
@@ -15,14 +15,16 @@ export function FormColor({label, defaultValue, propertyName}) {
     const [color, setColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
     const [previousColor, setPreviousColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
 
+    const {postConfig} = useConfigMutation();
+
     const handleCheck = (checked) => {
-        updateAnothertime(propertyName, checked ? color : "default");
+        postConfig(propertyName, checked ? color : "default");
         setChecked(checked);
     }
 
     const handleChange = debounce((color) => {
         setColor(color);
-        updateAnothertime(propertyName, color);
+        postConfig(propertyName, color);
     }, 100);
 
     const handleClick = () => {
@@ -32,13 +34,13 @@ export function FormColor({label, defaultValue, propertyName}) {
     const handleSave = () => {
         if (color !== previousColor) {
             setPreviousColor(color);
-            updateAnothertime(propertyName, color);
+            postConfig(propertyName, color);
         }
     }
     const handleCancel = () => {
         if (color !== previousColor) {
             setColor(previousColor);
-            updateAnothertime(propertyName, previousColor);
+            postConfig(propertyName, previousColor);
         }
     }
 

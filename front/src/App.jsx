@@ -22,7 +22,7 @@ function App() {
                 theme="colored"
             />
             <Home />
-            <ReactQueryDevtools initialIsOpen={false} />
+            <ReactQueryDevtools initialIsOpen={false}/>
         </QueryClientProvider>
     )
 }

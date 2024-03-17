@@ -1,5 +1,4 @@
 import {useId, useRef} from "react";
-import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {FaGear} from "react-icons/fa6";
 import debounce from "debounce";
 import {Label} from "@/components/ui/label.jsx";
@@ -8,6 +7,7 @@ import {Input} from "@/components/ui/input.jsx";
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from "@/components/ui/collapsible.jsx";
 import {Slider} from "@/components/ui/slider.jsx";
 import {useImmer} from "use-immer";
+import {useConfigMutation} from "@/hooks/useConfig.js";
 
 export function FormIcon({label, defaultValue, propertyName}) {
 
@@ -16,26 +16,28 @@ export function FormIcon({label, defaultValue, propertyName}) {
     const xId = useId();
     const yId = useId();
 
+    const {postConfig} = useConfigMutation();
+
     const handleKey = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            updateAnothertime(propertyName + ".name", e.target.value);
+            postConfig(propertyName + ".name", e.target.value);
         }
     }
 
     const handleClick = () => {
-        updateAnothertime(propertyName + ".name", iconRef.current.value);
+        postConfig(propertyName + ".name", iconRef.current.value);
     }
 
     const handleOffsetX = debounce((value) =>
         setOffset((draft) => {
             draft.x = value[0];
-            updateAnothertime(propertyName, draft);
+            postConfig(propertyName, draft);
         }), 100);
     const handleOffsetY = debounce((value) =>
         setOffset((draft) => {
             draft.y = value[0];
-            updateAnothertime(propertyName, draft);
+            postConfig(propertyName, draft);
         }), 100);
 
     const id = useId();

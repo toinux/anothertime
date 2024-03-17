@@ -1,15 +1,17 @@
 import {useId, useState} from "react";
-import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {Switch} from "@/components/ui/switch.jsx";
 import {Label} from "@/components/ui/label.jsx";
+import {useConfigMutation} from "@/hooks/useConfig.js";
 
 export function FormBoolean({label, defaultValue, propertyName}) {
     const id = useId();
 
     const [checked, setChecked] = useState(defaultValue);
 
+    const {postConfig} = useConfigMutation();
+
     const handleCheck = (checked) => {
-        updateAnothertime(propertyName, checked);
+        postConfig(propertyName, checked);
         setChecked(checked);
     }
 

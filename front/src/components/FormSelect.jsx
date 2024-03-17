@@ -1,14 +1,17 @@
 import {useId} from "react";
-import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {Label} from "@/components/ui/label.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
+import {useConfigMutation} from "@/hooks/useConfig.js";
 
 export function FormSelect({label, defaultValue, values, propertyName, handleChange}) {
+
+    const {postConfig} = useConfigMutation();
+
     const handleValueChange = (value) => {
         if (handleChange !== undefined) {
             handleChange(value);
         }
-        updateAnothertime(propertyName, value);
+        postConfig(propertyName, value);
     }
 
     const id = useId();
