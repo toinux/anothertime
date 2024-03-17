@@ -1,5 +1,4 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {handleException} from "@/lib/handleException.js";
 import {createNestedObject} from "@/lib/utils.js";
 import {toast} from "react-toastify";
 
@@ -76,3 +75,7 @@ export const useSaveMutation = () =>
         mutationKey: ["save"],
         mutationFn: saveConfig
     });
+
+const handleException = (title, message) => {
+    toast.error(`${title} : ${message}`)
+}
