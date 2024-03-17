@@ -1,5 +1,5 @@
 import {useId, useRef} from "react";
-import {FaGear} from "react-icons/fa6";
+import {Settings2} from "lucide-react";
 import debounce from "debounce";
 import {Label} from "@/components/ui/label.jsx";
 import {Button} from "@/components/ui/button.jsx";
@@ -50,9 +50,9 @@ export function FormIcon({label, defaultValue, propertyName}) {
                    className={"rounded-none shrink"}
                    defaultValue={defaultValue.name} onKeyDown={handleKey}/>
             <CollapsibleTrigger asChild={true}>
-                <Button className={"h-10 rounded-none"} title={"Change position"}><FaGear/></Button>
+                <Button className={"h-10 rounded-none"} title={"Change position"}><Settings2 className={"size-4"}/></Button>
             </CollapsibleTrigger>
-            <Button className={"h-10 rounded-tl-none rounded-bl-none"} onClick={handleClick}>Ok</Button>
+            <Button className={"h-10 rounded-tl-none rounded-bl-none text-base"} onClick={handleClick}>Ok</Button>
         </div>
         <CollapsibleContent
             className={'overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'}>

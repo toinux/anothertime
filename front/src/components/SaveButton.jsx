@@ -1,4 +1,4 @@
-import {FaSave} from "react-icons/fa";
+import {Save} from "lucide-react";
 import {Button} from "@/components/ui/button.jsx";
 import {useSaveMutation} from "@/hooks/useConfig.js";
 
@@ -10,7 +10,7 @@ export function SaveButton() {
         mutate();
     }
 
-    return <Button onClick={handleClick}><FaSave className={"mr-2 size-4"}/><span
+    return <Button onClick={handleClick}><Save className={"mr-2 size-4"}/><span
         className={"text-lg"}>Save</span></Button>
 
 }
