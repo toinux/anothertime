@@ -3,8 +3,11 @@ import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {Label} from "@/components/ui/label.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 
-export function FormSelect({label, defaultValue, values, propertyName}) {
-    const handleChange = (value) => {
+export function FormSelect({label, defaultValue, values, propertyName, handleChange}) {
+    const handleValueChange = (value) => {
+        if (handleChange !== undefined) {
+            handleChange(value);
+        }
         updateAnothertime(propertyName, value);
     }
 
@@ -15,7 +18,7 @@ export function FormSelect({label, defaultValue, values, propertyName}) {
             <Label className={"text-base"} htmlFor={id}>{label}</Label>
         </div>
         <div className={"grow"}>
-            <Select defaultValue={defaultValue} onValueChange={handleChange}>
+            <Select defaultValue={defaultValue} onValueChange={handleValueChange}>
                 <SelectTrigger className={"rounded-tl-none rounded-bl-none"} id={id}>
                     <SelectValue placeholder={label}/>
                 </SelectTrigger>

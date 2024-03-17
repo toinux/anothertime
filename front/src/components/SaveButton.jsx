@@ -28,6 +28,6 @@ export function SaveButton() {
 
     }
 
-    return <Button onClick={handleClick}><FaSave/> Save</Button>
+    return <Button onClick={handleClick}><FaSave className={"mr-2 size-4"}/><span className={"text-lg"}>Save</span></Button>
 
 }

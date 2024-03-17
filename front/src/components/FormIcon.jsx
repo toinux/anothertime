@@ -39,25 +39,28 @@ export function FormIcon({label, defaultValue, propertyName}) {
         }), 100);
 
     const id = useId();
-    return <>
-                <Label htmlFor={id}>{label}</Label>
-                <Input type="text" ref={iconRef} id={id} placeholder={defaultValue.name} defaultValue={defaultValue.name} onKeyDown={handleKey} />
-
-
-        <Collapsible>
+    return <Collapsible className={"mb-4"}>
+        <div className={"flex"}>
+            <div className={"p-1.5 bg-accent rounded-tl-md rounded-bl-md border border-r-0"}>
+                <Label className={"text-base"} htmlFor={id}>{label}</Label>
+            </div>
+            <Input type="text" ref={iconRef} id={id} placeholder={defaultValue.name}
+                   className={"rounded-none shrink"}
+                   defaultValue={defaultValue.name} onKeyDown={handleKey}/>
             <CollapsibleTrigger asChild={true}>
-                <Button style={{height: "2.5rem"}}><FaGear /></Button>
+                <Button className={"h-10 rounded-none"} title={"Change position"}><FaGear/></Button>
             </CollapsibleTrigger>
-            <Button style={{height: "2.5rem"}} onClick={handleClick}>Ok</Button>
-            <CollapsibleContent className={'overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'}>
-                <div>
-                    <Label htmlFor={xId}>X offset : {offset.x}</Label>
-                    <Slider id={xId} defaultValue={[offset.x]} min={-32} max={32} step={1} onValueChange={handleOffsetX}/>
-                    <Label htmlFor={yId}>Y offset {offset.y}</Label>
-                    <Slider id={yId} defaultValue={[offset.y]} min={-8} max={8} step={1} onValueChange={handleOffsetY}/>
-                </div>
-            </CollapsibleContent>
-        </Collapsible>
-    </>
-
+            <Button className={"h-10 rounded-tl-none rounded-bl-none"} onClick={handleClick}>Ok</Button>
+        </div>
+        <CollapsibleContent
+            className={'overflow-hidden data-[state=open]:animate-collapsible-down data-[state=closed]:animate-collapsible-up'}>
+            <div className={"my-2"}>
+                <Label htmlFor={xId}>X offset : {offset.x}</Label>
+                <Slider id={xId} defaultValue={[offset.x]} min={-32} max={32} step={1}
+                        onValueChange={handleOffsetX}/>
+                <Label htmlFor={yId}>Y offset : {offset.y}</Label>
+                <Slider id={yId} defaultValue={[offset.y]} min={-8} max={8} step={1} onValueChange={handleOffsetY}/>
+            </div>
+        </CollapsibleContent>
+    </Collapsible>
 }

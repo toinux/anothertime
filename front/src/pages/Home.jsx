@@ -14,12 +14,10 @@ export default function Home() {
     const {data: config} = useConfig();
 
     return <div className={"relative flex min-h-screen flex-col bg-background text-foreground"}>
-        {/*bg-primary text-primary-foreground*/}
-        <header className={"sticky top-0 z-50 w-full backdrop-blur drop-shadow-xl mb-12 p-4"}
-            // className="justify-between px-4 py-3 text-gray-700 border border-gray-200 rounded-lg sm:flex sm:px-5 bg-gray-50 dark:bg-gray-800 dark:border-gray-700"
+        <header className={"sticky top-0 z-50 w-full backdrop-blur drop-shadow-xl sm:mb-12 p-4"}
         >
-            <div className={"container flex justify-between"}>
-                <div className={"text-4xl font-semibold"}>Anothertime</div>
+            <div className={"sm:container flex justify-between"}>
+                <div className={"text-3xl sm:text-4xl font-semibold mr-2"}>Anothertime</div>
                 <div className={"flex gap-4"}>
                 <TrackedSpinner/>
                 {config && <SaveButton/>}
@@ -27,7 +25,7 @@ export default function Home() {
             </div>
         </header>
         <main className={"flex-1"}>
-            <div className="container">
+            <div className="sm:container">
                 {
                     config && <>
                         <Time/>
