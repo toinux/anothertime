@@ -4,8 +4,8 @@ import debounce from "debounce";
 import {updateAnothertime} from "@/lib/updateAnothertime.js";
 import {Button} from "@/components/ui/button.jsx";
 import {Label} from "@/components/ui/label.jsx";
-import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from "@/components/ui/popover.jsx";
 import {Switch} from "@/components/ui/switch.jsx";
+import {Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger} from "@/components/ui/dialog.jsx";
 
 export function FormColor({label, defaultValue, propertyName}) {
     const id = useId();
@@ -26,20 +26,16 @@ export function FormColor({label, defaultValue, propertyName}) {
     }, 100);
 
     const handleClick = () => {
-        //e.preventDefault();
-        console.log("setPreviousColor");
         setPreviousColor(color);
     }
 
     const handleSave = () => {
-        console.log("save");
         if (color !== previousColor) {
             setPreviousColor(color);
             updateAnothertime(propertyName, color);
         }
     }
     const handleCancel = () => {
-        console.log("cancel");
         if (color !== previousColor) {
             setColor(previousColor);
             updateAnothertime(propertyName, previousColor);
@@ -69,8 +65,8 @@ export function FormColor({label, defaultValue, propertyName}) {
             <Label htmlFor={id} className={"ml-2 align-top text-base"}>{label}</Label>
         </div>
         {checked &&
-            <Popover>
-                <PopoverTrigger asChild={true}>
+            <Dialog>
+                <DialogTrigger asChild={true}>
                     <Button
                         className={"group p-2 sm:p-4"}
                         variant={"outline"}
@@ -85,42 +81,42 @@ export function FormColor({label, defaultValue, propertyName}) {
                         />
                         <span className={"font-mono uppercase"}>{color}</span>
                     </Button>
-                </PopoverTrigger>
-                <PopoverContent onPointerDownOutside={handleCancel} onEscapeKeyDown={handleCancel} asChild={true}>
-                    <div className={"w-80 mr-4 sm:mr-0"}>
-                        <div>
-                            <HexColorPicker className={"min-w-full mb-2"} color={color} onChange={handleChange}/>
-                            <div className={"w-72 grid grid-cols-9 gap-2"}>
-                                {colorList}
-                            </div>
-                            <div className={"flex py-2 mb-4"}>
-                                <div className={"py-2"}>
-                                    <Label htmlFor={idHexColorInput}
-                                           className={"mr-2 text-base align-bottom"}>Hexadecimal color :</Label>
-                                </div>
-                                <div>
-                                    <HexColorInput
-                                        id={idHexColorInput}
-                                        className={"flex uppercase font-mono h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"}
-                                        color={color} onChange={handleChange} prefixed={true}/>
-                                </div>
-                            </div>
+                </DialogTrigger>
+                <DialogContent className={"w-80 p-4 rounded-lg"} onPointerDownOutside={handleCancel} onEscapeKeyDown={handleCancel}
+                               addCloseButton={false}>
+                    <DialogTitle>{label}</DialogTitle>
+                    <HexColorPicker className={"min-w-full mb-2"} color={color} onChange={handleChange}/>
+                    <div className={"w-72 grid grid-cols-9 gap-2"}>
+                        {colorList}
+                    </div>
+                    <div className={"flex py-2 mb-4"}>
+                        <div className={"py-2"}>
+                            <Label htmlFor={idHexColorInput}
+                                   className={"mr-2 text-base align-bottom"}>Hexadecimal color :</Label>
                         </div>
                         <div>
-                            <PopoverClose asChild={true}>
-                                <div className={"flex justify-end"}>
-                                    <Button  className={"mr-4"} variant="outline" onClick={handleCancel}>
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={handleSave}>
-                                        Apply
-                                    </Button>
-                                </div>
-                            </PopoverClose>
+                            <HexColorInput
+                                id={idHexColorInput}
+                                className={"flex uppercase font-mono h-10 w-24 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"}
+                                color={color} onChange={handleChange} prefixed={true}/>
                         </div>
                     </div>
-                </PopoverContent>
-            </Popover>
+                    <DialogFooter asChild={true}>
+                        <div className={"flex justify-end"}>
+                            <DialogClose asChild={true}>
+                                <Button  className={"mr-4"} variant="outline" onClick={handleCancel}>
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <DialogClose asChild={true}>
+                                <Button onClick={handleSave}>
+                                    Apply
+                                </Button>
+                            </DialogClose>
+                        </div>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
         }
 
