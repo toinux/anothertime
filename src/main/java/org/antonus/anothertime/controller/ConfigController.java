@@ -28,6 +28,11 @@ public class ConfigController {
         mapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
     }
 
+    @GetMapping("/load")
+    void load() {
+        settingsService.loadSettings();
+    }
+
     @PostMapping("/save")
     void save() {
         settingsService.saveSettings();
