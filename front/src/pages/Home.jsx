@@ -9,10 +9,12 @@ import {SaveButton} from "@/components/SaveButton.jsx";
 import {TrackedSpinner} from "@/components/TrackedSpinner.jsx";
 import useConfig from "@/hooks/useConfig.js";
 import {ThemeChooser} from "@/components/ThemeChooser.jsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
+import {AlertCircle} from "lucide-react";
 
 export default function Home() {
 
-    const {isSuccess} = useConfig();
+    const {isSuccess, isError, error} = useConfig();
 
     return <div className={"relative flex min-h-screen flex-col bg-background text-foreground"}>
         <header className={"sticky top-0 z-50 w-full backdrop-blur drop-shadow-xl sm:mb-12 p-4"}
@@ -39,6 +41,13 @@ export default function Home() {
                         <HumidityWidget/>
                     </>
                 }
+                {isError && <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4"/>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>
+                        {error.toString()}
+                    </AlertDescription>
+                </Alert>}
             </div>
         </main>
     </div>;

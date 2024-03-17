@@ -1,23 +1,13 @@
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {createNestedObject} from "@/lib/utils.js";
 import {toast} from "react-toastify";
+import ky from 'ky';
 
 /**
  *
  * @returns {Promise<AnothertimeConfig>}
  */
-const fetchConfig = () =>
-    fetch("/config")
-        .then(r => {
-            if (r.status !== 200) {
-                handleException("fetch /config", r.statusText);
-                return null;
-            }
-            return r.json();
-        })
-        .catch(e => {
-            handleException("Error", e.toString());
-        })
+const fetchConfig = () => ky.get("/config").json();
 
 const saveConfig = () => {
 

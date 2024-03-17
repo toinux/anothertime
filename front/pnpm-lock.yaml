@@ -50,6 +50,9 @@ dependencies:
   immer:
     specifier: ^10.0.4
     version: 10.0.4
+  ky:
+    specifier: ^1.2.2
+    version: 1.2.2
   lucide-react:
     specifier: ^0.357.0
     version: 0.357.0(react@18.2.0)
@@ -3063,6 +3066,11 @@ packages:
     dependencies:
       json-buffer: 3.0.1
     dev: true
+
+  /ky@1.2.2:
+    resolution: {integrity: sha512-gYA2QOI3uIaImJPJjaBbLCdvKHzwxsuB03s7PjrXmoO6tcn6k53rwYoSRgqrmVsEV6wFFegOXDVjABxFZ0aRSg==}
+    engines: {node: '>=18'}
+    dev: false
 
   /levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
