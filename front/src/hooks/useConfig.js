@@ -9,13 +9,8 @@ import ky from 'ky';
  */
 const fetchConfig = () => ky.get("/config").json();
 
-const saveConfig = () => {
-
-    const promise = fetch("/save", {
-        method: "POST"
-    });
-
-    return toast.promise(promise, {
+const saveConfig = () =>
+    toast.promise(ky.post("/save"), {
         pending: "Saving settings...",
         error: {
             render({data}) {
@@ -23,24 +18,11 @@ const saveConfig = () => {
             }
         },
         success: "Settings saved !"
-    })
-};
+    });
 
-const postConfig = (payload) =>
-    fetch("/config", {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        method: "POST",
-        body: JSON.stringify(payload)
-    }).then((r) => {
-        if (r.status !== 200) {
-            handleException("Could not update config", r.statusText);
-        }
-    }).catch(function (e) {
-        handleException("Error", e.toString());
-    })
+const postConfig = (payload) => ky.post("/config", {
+    json: payload
+});
 
 
 export default function useConfig() {
@@ -55,7 +37,8 @@ export default function useConfig() {
 export function useConfigMutation()  {
     const mutation = useMutation({
         mutationKey: ["config"],
-        mutationFn: postConfig
+        mutationFn: postConfig,
+        onError: (e) => handleException("Could not update config", e)
     });
     return {...mutation, postConfig: (keyString, value) => mutation.mutate(createNestedObject(keyString, value))};
 }
