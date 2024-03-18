@@ -17,7 +17,7 @@ export function FormBoolean({label, defaultValue, propertyName}) {
 
     return <div className="flex items-center space-x-2 mb-4">
         <Switch id={id} checked={checked} onCheckedChange={handleCheck}/>
-        <Label htmlFor={id}>{label}</Label>
+        <Label className={"text-base"} htmlFor={id}>{label}</Label>
     </div>
 
 }
