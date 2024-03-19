@@ -28,7 +28,7 @@ public class ConfigController {
         mapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
     }
 
-    @GetMapping("/load")
+    @PostMapping("/load")
     void load() {
         settingsService.loadSettings();
     }
