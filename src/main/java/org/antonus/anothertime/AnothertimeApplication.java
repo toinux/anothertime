@@ -25,7 +25,9 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.Assert;
@@ -36,6 +38,7 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +59,15 @@ public class AnothertimeApplication {
     @Bean
     AwtrixClient awtrixClient(RestClient.Builder builder) {
         Assert.notNull(anothertimeProperties.getAwtrixUrl(),"Please set anothertime.awtrix-url");
-        RestClient restClient = builder.baseUrl(anothertimeProperties.getAwtrixUrl()).requestFactory(new JdkClientHttpRequestFactory()).build();
+        RestClient restClient = builder
+                .baseUrl(anothertimeProperties.getAwtrixUrl())
+                .requestFactory(new JdkClientHttpRequestFactory())
+                .messageConverters(httpMessageConverters -> {
+                    var jsonConverter = new MappingJackson2HttpMessageConverter();
+                    jsonConverter.setSupportedMediaTypes(List.of(new MediaType("text", "json")));
+                    httpMessageConverters.add(jsonConverter);
+                })
+                .build();
 
         return HttpServiceProxyFactory.builder()
                 .exchangeAdapter(RestClientAdapter.create(restClient))
