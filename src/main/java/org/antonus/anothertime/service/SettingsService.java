@@ -7,10 +7,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.mapstruct.AnothertimePropertiesMapper;
+import org.antonus.anothertime.mapstruct.AnothertimePropertiesWithNullStragegyMapper;
 import org.antonus.anothertime.model.AnothertimePropertiesDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 public class SettingsService {
     private final AnothertimeProperties anothertimeProperties;
     private final ObjectMapper objectMapper;
-    private final ResourceLoader resourceLoader;
     private final AnothertimePropertiesMapper mapper;
+    private final AnothertimePropertiesWithNullStragegyMapper nullStragegyMapper;
     @Value("file:./anothertime-settings.json")
     private Resource settingsResource;
 
@@ -30,7 +30,7 @@ public class SettingsService {
             try {
                 log.info("anothertime-settings.json found, applying settings");
                 AnothertimePropertiesDto anothertimePropertiesDto = objectMapper.readValue(settingsResource.getFile(), AnothertimePropertiesDto.class);
-                mapper.updateFromDtoWithNullMapping(anothertimePropertiesDto, anothertimeProperties);
+                nullStragegyMapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
             } catch (Exception e) {
                 log.error("could not load anothertime-settings.json : {}", e.getMessage());
             }

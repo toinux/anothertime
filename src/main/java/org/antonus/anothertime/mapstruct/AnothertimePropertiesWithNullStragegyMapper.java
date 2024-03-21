@@ -7,12 +7,10 @@ import org.mapstruct.control.DeepClone;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL,
         mappingControl = DeepClone.class)
-public interface AnothertimePropertiesMapper {
+public interface AnothertimePropertiesWithNullStragegyMapper {
 
     void updateFromDto(AnothertimePropertiesDto dto, @MappingTarget AnothertimeProperties properties);
 
-
-    AnothertimePropertiesDto map(AnothertimeProperties properties);
 }
