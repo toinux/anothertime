@@ -25,7 +25,7 @@ export default function Home() {
         if (isSuccess) {
             setConfig(data);
         }
-    }, [isFetching]);
+    }, [isFetching, data]);
 
     return <div className={"relative flex min-h-screen flex-col bg-background text-foreground"}>
         <header className={"sticky top-0 z-50 w-full backdrop-blur drop-shadow-xl sm:mb-12 p-4"}

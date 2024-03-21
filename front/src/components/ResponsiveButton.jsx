@@ -25,3 +25,4 @@ export const ResponsiveButton = forwardRef(({className, children, label, tooltip
     </TooltipProvider>
 
 });
+ResponsiveButton.displayName = "ResponsiveButton";

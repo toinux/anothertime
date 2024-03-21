@@ -18,7 +18,7 @@ export function FormColor({label, propertyName}) {
     const checked = useMemo(() => value !== null && value !== "default", [value]);
     // TODO : mettre le previousColor dans le localstorage ? ou le gérer en backend ?
     const [previousColor, setPreviousColor] = useState((value === null || value === "default") ? "#ffffff" : value);
-    const color = useMemo(() => (value === null || value === "default") ? previousColor : value, [value]);
+    const color = useMemo(() => (value === null || value === "default") ? previousColor : value, [value, previousColor]);
 
 
 

@@ -33,7 +33,7 @@ export function FormIcon({label, propertyName}) {
             draft.x = x;
             draft.y = y;
         });
-    }, [x, y]);
+    }, [x, y, setOffset]);
 
 
 
