@@ -13,5 +13,8 @@ public interface AnothertimePropertiesMapper {
 
     void updateFromDto(AnothertimePropertiesDto dto, @MappingTarget AnothertimeProperties properties);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
+    void updateFromDtoWithNullMapping(AnothertimePropertiesDto dto, @MappingTarget AnothertimeProperties properties);
+
     AnothertimePropertiesDto map(AnothertimeProperties properties);
 }

@@ -30,7 +30,7 @@ public class SettingsService {
             try {
                 log.info("anothertime-settings.json found, applying settings");
                 AnothertimePropertiesDto anothertimePropertiesDto = objectMapper.readValue(settingsResource.getFile(), AnothertimePropertiesDto.class);
-                mapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
+                mapper.updateFromDtoWithNullMapping(anothertimePropertiesDto, anothertimeProperties);
             } catch (Exception e) {
                 log.error("could not load anothertime-settings.json : {}", e.getMessage());
             }
