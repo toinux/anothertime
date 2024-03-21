@@ -1,5 +1,5 @@
 import {create} from "zustand";
-import {persist} from "zustand/middleware";
+import {devtools, persist} from "zustand/middleware";
 
 /**
  * @typedef {"dark" | "light" | "system"} Theme
@@ -11,11 +11,13 @@ import {persist} from "zustand/middleware";
  * @property {function(theme: Theme): void} setTheme
  */
 
-const usePreferencesStore = create(persist((set) => /** @type PreferencesStore */({
+const usePreferencesStore = create(devtools(persist((set) => /** @type PreferencesStore */({
     theme: "system",
     setTheme: (theme) => set({theme})
 }), {
     name: "anothertime.preferences"
+}),{
+    name: "preferences"
 }));
 
 export default usePreferencesStore;

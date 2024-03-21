@@ -1,7 +1,9 @@
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {createNestedObject} from "@/lib/utils.js";
 import {toast} from "react-toastify";
 import ky from 'ky';
+import {omit} from "lodash";
+import useConfigStore from "@/hooks/useConfigStore.js";
 
 /**
  *
@@ -21,8 +23,19 @@ const saveConfig = () =>
     });
 
 const postConfig = (payload) => ky.post("/config", {
-    json: payload
+    json: omit(payload, ["_keyString"])
 });
+
+const reloadConfig = () =>
+    toast.promise(ky.post("/load"), {
+        pending: "Reloading settings...",
+        error: {
+            render({data}) {
+                return `Impossible to reload settings : ${data}`
+            }
+        },
+        success: "Settings reloaded !"
+    });
 
 
 export default function useConfig() {
@@ -35,12 +48,28 @@ export default function useConfig() {
 }
 
 export function useConfigMutation()  {
+
+    const setConfig = useConfigStore(state => state.setConfig);
+    const getValue = useConfigStore(state => state.getValue);
+
     const mutation = useMutation({
         mutationKey: ["config"],
         mutationFn: postConfig,
-        onError: (e) => handleException("Could not update config", e)
+        onMutate: (value) => {
+            // on part du principe que c'est OK, on positionne tout de suite la nouvelle valeur
+            // on rollbackera plus tard en cas d'erreur
+            const oldValue = getValue(value._keyString);
+            setConfig(value);
+            return oldValue;
+        },
+        onError: (e, newValue, oldValue) => {
+            // ici on repositionne oldValue en cas d'erreur
+            setConfig(createNestedObject(newValue._keyString, oldValue));
+            handleException("Could not update config", e);
+        }
     });
     return {...mutation, postConfig: (keyString, value) => mutation.mutate(createNestedObject(keyString, value))};
+
 }
 
 export const useSaveMutation = () =>
@@ -48,6 +77,19 @@ export const useSaveMutation = () =>
         mutationKey: ["save"],
         mutationFn: saveConfig
     });
+
+export const useReloadMutation = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["reload"],
+        mutationFn: reloadConfig,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ["config"]
+            })
+        }
+    });
+}
 
 const handleException = (title, message) => {
     toast.error(`${title} : ${message}`)

@@ -1,8 +1,8 @@
 import {Save} from "lucide-react";
-import {Button} from "@/components/ui/button.jsx";
 import {useSaveMutation} from "@/hooks/useConfig.js";
+import {ResponsiveButton} from "@/components/ResponsiveButton.jsx";
 
-export function SaveButton() {
+export function SaveButton({...props}) {
 
     const {mutate} = useSaveMutation();
 
@@ -10,7 +10,8 @@ export function SaveButton() {
         mutate();
     }
 
-    return <Button onClick={handleClick}><Save className={"mr-2 size-4"}/><span
-        className={"text-lg"}>Save</span></Button>
+    return <ResponsiveButton onClick={handleClick} tooltip={"Save"} {...props}>
+        <Save/>
+    </ResponsiveButton>;
 
 }

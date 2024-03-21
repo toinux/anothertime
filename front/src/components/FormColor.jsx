@@ -1,31 +1,37 @@
-import {useId, useMemo, useState} from "react";
+import {useCallback, useId, useMemo, useState} from "react";
 import {HexColorInput, HexColorPicker} from "react-colorful";
 import debounce from "debounce";
 import {Button} from "@/components/ui/button.jsx";
 import {Label} from "@/components/ui/label.jsx";
 import {Switch} from "@/components/ui/switch.jsx";
-import {Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogTrigger} from "@/components/ui/dialog.jsx";
+import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog.jsx";
 import {useConfigMutation} from "@/hooks/useConfig.js";
+import {useConfigValue} from "@/hooks/useConfigStore.js";
 
-export function FormColor({label, defaultValue, propertyName}) {
+export function FormColor({label, propertyName}) {
+
     const id = useId();
     const idHexColorInput = useId();
 
-    const [checked, setChecked] = useState(defaultValue !== null);
-    const [color, setColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
-    const [previousColor, setPreviousColor] = useState(defaultValue == null ? "#ffffff" : defaultValue);
+    const value = useConfigValue(propertyName);
+
+    const checked = useMemo(() => value !== null && value !== "default", [value]);
+    // TODO : mettre le previousColor dans le localstorage ? ou le gérer en backend ?
+    const [previousColor, setPreviousColor] = useState((value === null || value === "default") ? "#ffffff" : value);
+    const color = useMemo(() => (value === null || value === "default") ? previousColor : value, [value]);
+
+
 
     const {postConfig} = useConfigMutation();
 
     const handleCheck = (checked) => {
         postConfig(propertyName, checked ? color : "default");
-        setChecked(checked);
     }
 
-    const handleChange = debounce((color) => {
-        setColor(color);
+    const handleChange = useCallback(debounce((color) => {
         postConfig(propertyName, color);
-    }, 100);
+    }, 100), []);
+
 
     const handleClick = () => {
         setPreviousColor(color);
@@ -39,7 +45,7 @@ export function FormColor({label, defaultValue, propertyName}) {
     }
     const handleCancel = () => {
         if (color !== previousColor) {
-            setColor(previousColor);
+            // setColor(previousColor);
             postConfig(propertyName, previousColor);
         }
     }
@@ -103,20 +109,18 @@ export function FormColor({label, defaultValue, propertyName}) {
                                 color={color} onChange={handleChange} prefixed={true}/>
                         </div>
                     </div>
-                    <DialogFooter asChild={true}>
-                        <div className={"flex justify-end"}>
-                            <DialogClose asChild={true}>
-                                <Button  className={"mr-4"} variant="outline" onClick={handleCancel}>
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-                            <DialogClose asChild={true}>
-                                <Button onClick={handleSave}>
-                                    Apply
-                                </Button>
-                            </DialogClose>
-                        </div>
-                    </DialogFooter>
+                    <div className={"flex justify-end"}>
+                        <DialogClose asChild={true}>
+                            <Button  className={"mr-4"} variant="outline" onClick={handleCancel}>
+                                Cancel
+                            </Button>
+                        </DialogClose>
+                        <DialogClose asChild={true}>
+                            <Button onClick={handleSave}>
+                                Apply
+                            </Button>
+                        </DialogClose>
+                    </div>
                 </DialogContent>
             </Dialog>
 

@@ -11,19 +11,31 @@ import useConfig from "@/hooks/useConfig.js";
 import {ThemeChooser} from "@/components/ThemeChooser.jsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.jsx";
 import {AlertCircle} from "lucide-react";
+import {ReloadButton} from "@/components/ReloadButton.jsx";
+import useConfigStore from "@/hooks/useConfigStore.js";
+import {useEffect} from "react";
 
 export default function Home() {
 
-    const {isSuccess, isError, error} = useConfig();
+    const {isSuccess, isError, error, data, isFetching} = useConfig();
+    const setConfig = useConfigStore((state) => state.setConfig);
+    const isConfigSet = useConfigStore((state) => state.isConfigSet);
+
+    useEffect(() => {
+        if (isSuccess) {
+            setConfig(data);
+        }
+    }, [isFetching]);
 
     return <div className={"relative flex min-h-screen flex-col bg-background text-foreground"}>
         <header className={"sticky top-0 z-50 w-full backdrop-blur drop-shadow-xl sm:mb-12 p-4"}
         >
             <div className={"sm:container flex justify-between"}>
                 <div className={"text-3xl sm:text-4xl font-semibold mr-2"}>Anothertime</div>
-                <div className={"flex gap-4"}>
+                <div className={"flex gap-2 sm:gap-4"}>
                     <ThemeChooser/>
-                    {isSuccess && <SaveButton/>}
+                    <ReloadButton/>
+                    <SaveButton/>
                 </div>
             </div>
         </header>
@@ -31,7 +43,7 @@ export default function Home() {
         <main className={"flex-1"}>
             <div className="sm:container">
                 {
-                    isSuccess && <>
+                    isSuccess && isConfigSet && <>
                         <Time/>
                         <Seconds/>
                         <Week/>

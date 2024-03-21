@@ -1,15 +1,12 @@
 import {FormColor} from "@/components/FormColor.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
-import useConfig from "@/hooks/useConfig.js";
 
 export function Seconds() {
 
 
-    const {data: props} = useConfig();
-
-     return <SettingsContainer title = "Seconds">
-        <FormColor defaultValue={props.seconds.color} label={'Seconds color'} propertyName="seconds.color"/>
-        <FormColor defaultValue={props.seconds.backgroundColor} label={'Background color'} propertyName="seconds.backgroundColor"/>
-     </SettingsContainer>
+    return <SettingsContainer title="Seconds">
+        <FormColor label={'Seconds color'} propertyName="seconds.color"/>
+        <FormColor label={'Background color'} propertyName="seconds.backgroundColor"/>
+    </SettingsContainer>
 
 }

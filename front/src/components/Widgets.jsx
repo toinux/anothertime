@@ -1,14 +1,11 @@
 import {FormSelect} from "@/components/FormSelect.jsx";
 import {SettingsContainer} from "@/components/SettingsContainer.jsx";
-import useConfig from "@/hooks/useConfig.js";
 
 export function Widgets() {
 
-    const {data: props} = useConfig();
-
-     return <SettingsContainer title="Widgets">
-        <FormSelect defaultValue={props.widgets.animation} values={['NONE', 'SCROLL', 'FADE']}
+    return <SettingsContainer title="Widgets">
+        <FormSelect values={['NONE', 'SCROLL', 'FADE']}
                     label={'Animation'} propertyName="widgets.animation"/>
-     </SettingsContainer>
+    </SettingsContainer>
 
 }

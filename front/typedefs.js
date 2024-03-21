@@ -3,7 +3,10 @@
  */
 
 /**
- * @typedef {string} Icon
+ * @typedef {object} Icon
+ * @property {string} name
+ * @property {number} x
+ * @property {number} y
  */
 
 /**

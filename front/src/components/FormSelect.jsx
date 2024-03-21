@@ -2,10 +2,14 @@ import {useId} from "react";
 import {Label} from "@/components/ui/label.jsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.jsx";
 import {useConfigMutation} from "@/hooks/useConfig.js";
+import {useConfigValue} from "@/hooks/useConfigStore.js";
 
-export function FormSelect({label, defaultValue, values, propertyName, handleChange}) {
+export function FormSelect({label, values, propertyName, handleChange}) {
 
     const {postConfig} = useConfigMutation();
+
+    const value = useConfigValue(propertyName);
+
 
     const handleValueChange = (value) => {
         if (handleChange !== undefined) {
@@ -21,7 +25,7 @@ export function FormSelect({label, defaultValue, values, propertyName, handleCha
             <Label className={"text-base"} htmlFor={id}>{label}</Label>
         </div>
         <div className={"grow"}>
-            <Select defaultValue={defaultValue} onValueChange={handleValueChange}>
+            <Select value={value} onValueChange={handleValueChange}>
                 <SelectTrigger className={"rounded-tl-none rounded-bl-none"} id={id}>
                     <SelectValue placeholder={label}/>
                 </SelectTrigger>
