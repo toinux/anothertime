@@ -13,9 +13,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/config": process.env.BASE_URL || "http://localhost:8080",
-      "/save": process.env.BASE_URL || "http://localhost:8080",
-      "/load": process.env.BASE_URL || "http://localhost:8080"
+      "^/(config|save|load|icons)": process.env.BASE_URL || "http://localhost:8080"
     }
   }
 })

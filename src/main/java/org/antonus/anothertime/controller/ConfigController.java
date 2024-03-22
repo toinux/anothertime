@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.mapstruct.AnothertimePropertiesMapper;
 import org.antonus.anothertime.model.AnothertimePropertiesDto;
-import org.antonus.anothertime.model.FileIcon;
+import org.antonus.anothertime.model.FileIconDto;
 import org.antonus.anothertime.rest.AwtrixClient;
 import org.antonus.anothertime.service.SettingsService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -44,8 +46,17 @@ public class ConfigController {
     }
 
     @GetMapping("/icons")
-    List<String> getIcons() {
-        return awtrixClient.getIcons().stream().map(FileIcon::name).toList();
+    List<FileIconDto> getIcons() {
+        return awtrixClient.getIcons().stream()
+                .filter(f -> "file".equalsIgnoreCase(f.type()))
+                .map(f -> {
+                    try {
+                        return new FileIconDto(f.name(), URI.create(anothertimeProperties.getAwtrixUrl()).resolve("/ICONS/").resolve(f.name()).toURL());
+                    } catch (MalformedURLException e) {
+                       return  null;
+                    }
+                })
+                .toList();
     }
 
 }

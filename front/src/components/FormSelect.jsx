@@ -21,8 +21,8 @@ export function FormSelect({label, values, propertyName, handleChange}) {
     const id = useId();
 
     return <div className={"flex mb-4"}>
-        <div className={"p-1.5 w-48 bg-accent rounded-tl-md rounded-bl-md border border-r-0"}>
-            <Label className={"text-base"} htmlFor={id}>{label}</Label>
+        <div className={"p-1.5 w-48 bg-accent rounded-tl-md rounded-bl-md border border-r-0 flex"}>
+            <Label className={"text-base w-full"} htmlFor={id}>{label}</Label>
         </div>
         <div className={"grow"}>
             <Select value={value} onValueChange={handleValueChange}>
