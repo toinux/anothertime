@@ -37,19 +37,25 @@ public class AwtrixService {
 
     @Cacheable(value = "icons", sync = true)
     public int[] getIcon(String iconName, String defaultIcon) {
+        if (null == iconName || iconName.isBlank() || iconName.equalsIgnoreCase("default")) {
+            return getDefaultIcon(defaultIcon);
+        }
         try {
             return imageToBmp(ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName))));
         } catch (Exception e) {
-            if (null != defaultIcon) {
-                log.info("could not load icon {}, loading default icon {} instead", iconName, defaultIcon);
-                try {
-                    return imageToBmp(ImageIO.read(resourceLoader.getResource("classpath:icons/" + defaultIcon).getInputStream()));
-                } catch (Exception e2) {
-                    log.error("Could not load default icon {} : {}", defaultIcon, e.getMessage());
-                }
-            } else {
-                log.error("Could not retrieve icon {} : {}", iconName, e.getMessage());
-            }
+            log.info("could not load icon {}, loading default icon {} instead", iconName, defaultIcon);
+            return getDefaultIcon(defaultIcon);
+        }
+    }
+
+    private int[] getDefaultIcon(String defaultIcon) {
+        if (null == defaultIcon) {
+            return null;
+        }
+        try {
+            return imageToBmp(ImageIO.read(resourceLoader.getResource("classpath:icons/" + defaultIcon).getInputStream()));
+        } catch (Exception e) {
+            log.error("Could not load default icon {} : {}", defaultIcon, e.getMessage());
         }
         return null;
     }
