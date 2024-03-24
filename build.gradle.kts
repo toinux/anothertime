@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "org.antonus"
-version = "0.0.12"
+version = "1.0.0"
 
 val mapstructVersion = "1.5.5.Final"
 
