@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient, useSuspenseQuery} from "@tanstack/react-query";
 import {createNestedObject} from "@/lib/utils.js";
 import {toast} from "react-toastify";
 import ky from 'ky';
@@ -39,7 +39,7 @@ const reloadConfig = () =>
 
 
 export default function useConfig() {
-    return useQuery({
+    return useSuspenseQuery({
         queryKey: ["config"],
         queryFn: fetchConfig,
         refetchOnWindowFocus: false,

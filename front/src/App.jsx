@@ -3,29 +3,33 @@ import {ReactQueryDevtools} from '@tanstack/react-query-devtools'
 import Home from "@/pages/Home.jsx";
 import {ToastContainer} from "react-toastify";
 import ToastCloseButton from "@/components/ToastCloseButton.jsx";
+import {Suspense} from "react";
+import Loading from "@/pages/Loading.jsx";
 
 function App() {
 
     const queryClient = new QueryClient();
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <ToastContainer
-                position="bottom-center"
-                autoClose={2000}
-                closeButton={ToastCloseButton}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="colored"
-            />
-            <Home />
-            <ReactQueryDevtools initialIsOpen={false}/>
-        </QueryClientProvider>
+        <Suspense fallback={<Loading/>}>
+            <QueryClientProvider client={queryClient}>
+                <ToastContainer
+                    position="bottom-center"
+                    autoClose={2000}
+                    closeButton={ToastCloseButton}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="colored"
+                />
+                <Home/>
+                <ReactQueryDevtools initialIsOpen={false}/>
+            </QueryClientProvider>
+        </Suspense>
     )
 }
 
