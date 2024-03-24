@@ -1,12 +1,15 @@
-import {Spinner} from "@/components/Spinner.jsx";
-import {useIsFetching, useIsMutating} from "@tanstack/react-query";
+import { Spinner } from '@/components/Spinner.jsx';
+import { useIsFetching, useIsMutating } from '@tanstack/react-query';
 
-export function TrackedSpinner({className}) {
-
+export function TrackedSpinner({ className }) {
     const isMutating = useIsMutating();
     const isFetching = useIsFetching();
 
-    return <>
-        {(isMutating > 0 || isFetching > 0) && <Spinner className={className}/>}
-    </>
+    return (
+        <>
+            {(isMutating > 0 || isFetching > 0) && (
+                <Spinner className={className} />
+            )}
+        </>
+    );
 }

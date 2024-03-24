@@ -1,4 +1,4 @@
-import {useMutation, useQuery, useQueryClient, useSuspenseQuery} from "@tanstack/react-query";
+import {useMutation, useQueryClient, useSuspenseQuery} from "@tanstack/react-query";
 import {createNestedObject} from "@/lib/utils.js";
 import {toast} from "react-toastify";
 import ky from 'ky';
