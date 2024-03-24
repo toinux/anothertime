@@ -13,8 +13,9 @@ export default function IconInfo({ ...props }) {
             </PopoverTrigger>
             <PopoverContent>
                 <span className={'text-sm'}>
-                    To customize icon, add a 8x8 gif in the /ICONS folder of
-                    your Awtrix file manager.
+                    To change icon, add a 8x8 gif in the
+                    <span className={'text-nowrap'}>/ICONS</span> folder of your
+                    Awtrix file manager.
                 </span>
             </PopoverContent>
         </Popover>
