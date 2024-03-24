@@ -41,7 +41,7 @@ export default function Home() {
         </header>
         <TrackedSpinner className={"fixed top-20 right-4 z-50"}/>
         <main className={"flex-1"}>
-            <div className="sm:container">
+            <div className="sm:container sm:max-w-screen-md">
                 {
                     isSuccess && isConfigSet && <>
                         <Time/>
