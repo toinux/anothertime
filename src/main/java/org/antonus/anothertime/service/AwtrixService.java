@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.antonus.anothertime.model.AnimatedIcon;
 import org.antonus.anothertime.model.AwtrixSettings;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.rest.AwtrixClient;
@@ -12,11 +13,20 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.metadata.IIOMetadataNode;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.PixelGrabber;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 
 import static org.antonus.anothertime.utils.ColorUtils.rgb888;
 
@@ -36,16 +46,58 @@ public class AwtrixService {
     private String currentApp = "anothertime";
 
     @Cacheable(value = "icons", sync = true)
-    public int[] getIcon(String iconName, String defaultIcon) {
+    public AnimatedIcon getIcon(String iconName, String defaultIcon) {
         if (null == iconName || iconName.isBlank() || iconName.equalsIgnoreCase("default")) {
-            return getDefaultIcon(defaultIcon);
+            AnimatedIcon defaultAnimatedIcon = new AnimatedIcon();
+            // TODO : animate default icon too
+            defaultAnimatedIcon.addFrame(0, 0, getDefaultIcon(defaultIcon));
+            return  defaultAnimatedIcon;
+            // return getDefaultIcon(defaultIcon);
         }
         try {
-            return imageToBmp(ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName))));
+
+            ImageReader ir = ImageIO.getImageReadersBySuffix("gif").next();
+            ImageInputStream is = ImageIO.createImageInputStream(new ByteArrayInputStream(awtrixClient.getIcon(iconName)));
+            ir.setInput(is, false);
+            int numFrames = ir.getNumImages(true);
+            AnimatedIcon animatedIcon = new AnimatedIcon();
+            for (int i = 0; i < numFrames; i++) {
+                animatedIcon.addFrame(i, getFrameDelay(ir, i), imageToBmp(ir.read(i)));
+            }
+            return animatedIcon;
+
+            // return imageToBmp(ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName))));
         } catch (Exception e) {
             log.info("could not load icon {}, loading default icon {} instead", iconName, defaultIcon);
-            return getDefaultIcon(defaultIcon);
+            AnimatedIcon defaultAnimatedIcon = new AnimatedIcon();
+            // TODO : animate default icon too
+            defaultAnimatedIcon.addFrame(0,0, getDefaultIcon(defaultIcon));
+            return  defaultAnimatedIcon;
+            //return getDefaultIcon(defaultIcon);
         }
+    }
+
+    private static int getFrameDelay(ImageReader reader, int frameIndex) throws IOException {
+        // Get the metadata of the current frame
+        int delay = 0;
+        int imageMetadataIndex = reader.getMinIndex() + frameIndex;
+        IIOMetadata imageMetadata = reader.getImageMetadata(imageMetadataIndex);
+        String metaFormatName = imageMetadata.getNativeMetadataFormatName();
+
+        IIOMetadataNode root = (IIOMetadataNode) imageMetadata.getAsTree(metaFormatName);
+        NodeList children = root.getElementsByTagName("GraphicControlExtension");
+
+        // Loop through GraphicControlExtension nodes to find delay time
+        for (int i = 0; i < children.getLength(); i++) {
+            Node nodeItem = children.item(i);
+            NamedNodeMap attr = nodeItem.getAttributes();
+            Node delayNode = attr.getNamedItem("delayTime");
+            if (delayNode != null) {
+                delay = Integer.parseInt(delayNode.getNodeValue()) * 10; // Convert to milliseconds
+                break;
+            }
+        }
+        return delay;
     }
 
     private int[] getDefaultIcon(String defaultIcon) {
