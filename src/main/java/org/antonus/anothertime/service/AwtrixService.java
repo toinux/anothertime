@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.antonus.anothertime.model.AnimatedIcon;
+import org.antonus.anothertime.icons.AnimatedIcon;
 import org.antonus.anothertime.model.AwtrixSettings;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.rest.AwtrixClient;
@@ -25,7 +25,6 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.*;
 import java.awt.image.PixelGrabber;
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.io.IOException;
 
 import static org.antonus.anothertime.utils.ColorUtils.rgb888;

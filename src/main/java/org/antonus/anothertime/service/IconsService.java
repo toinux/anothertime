@@ -1,11 +1,9 @@
 package org.antonus.anothertime.service;
 
 import lombok.RequiredArgsConstructor;
-import org.antonus.anothertime.model.AnimatedFrame;
-import org.antonus.anothertime.model.AnimatedIcon;
+import org.antonus.anothertime.icons.AnimatedFrame;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
@@ -21,15 +19,12 @@ public class IconsService {
     private final AwtrixService awtrixService;
     private final CacheManager cacheManager;
 
-    // TODO : trouver un moyer de mettre en cache avec en plus l'index de la frame
-//    @Cacheable(value = "icons", keyGenerator = "dimmedIconKeyGenerator")
     public int[] getDimmedIcon(String iconName, String defaultIcon, float dim) {
         Cache cache = cacheManager.getCache("icons");
         assert cache != null;
 
-        // AnimatedIcon animatedIcon = awtrixService.getIcon(iconName, defaultIcon);
-
         AnimatedFrame animatedFrame = awtrixService.getIcon(iconName, defaultIcon).getFrame();
+
         int[] icon = animatedFrame.frame();
         if (dim >= 1 || null == icon) {
             return icon;
