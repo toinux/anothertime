@@ -1,6 +1,6 @@
 package org.antonus.anothertime.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -8,10 +8,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.antonus.anothertime.model.AwtrixSettings;
 import org.antonus.anothertime.model.AwtrixStats;
 import org.antonus.anothertime.rest.AwtrixClient;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -25,7 +25,7 @@ import static org.antonus.anothertime.utils.ColorUtils.rgb888;
 @Slf4j
 public class AwtrixService {
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final AwtrixClient awtrixClient;
     private final ResourceLoader resourceLoader;
 
@@ -66,12 +66,12 @@ public class AwtrixService {
     }
 
     @SneakyThrows
-    public void handleStats(MqttMessage message) {
-        this.awtrixStats = objectMapper.readValue(message.getPayload(), AwtrixStats.class);
+    public void handleStats(Mqtt3Publish message) {
+        this.awtrixStats = jsonMapper.readValue(message.getPayloadAsBytes(), AwtrixStats.class);
     }
 
-    public void handleCurrentApp(MqttMessage message) {
-        currentApp = new String(message.getPayload());
+    public void handleCurrentApp(Mqtt3Publish message) {
+        currentApp = new String(message.getPayloadAsBytes());
     }
 
     private static int[] imageToBmp(Image image) throws InterruptedException {

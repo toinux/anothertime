@@ -1,19 +1,18 @@
 package org.antonus.anothertime.model;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.awt.*;
 import java.util.ArrayList;
 
 class AwtrixPayloadTest {
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    JsonMapper jsonMapper = new JsonMapper();
 
     @Test
-    void testSerialization() throws JsonProcessingException {
+    void testSerialization() {
 
         var drawList = new ArrayList<Draw>();
 
@@ -27,6 +26,6 @@ class AwtrixPayloadTest {
                 .draw(drawList)
                 .build();
 
-        Assertions.assertEquals("{\"text\":\"mon texte\",\"draw\":[{\"dp\":[1,2,[0,0,0]]},{\"dp\":[3,4,[0,0,255]]},{\"dr\":[3,4,5,6,[0,255,0]]},{\"db\":[1,2,3,4,[4,5,6,7]]}]}", objectMapper.writeValueAsString(payload));
+        Assertions.assertEquals("{\"text\":\"mon texte\",\"draw\":[{\"dp\":[1,2,[0,0,0]]},{\"dp\":[3,4,[0,0,255]]},{\"dr\":[3,4,5,6,[0,255,0]]},{\"db\":[1,2,3,4,[4,5,6,7]]}]}", jsonMapper.writeValueAsString(payload));
     }
 }
