@@ -10,12 +10,12 @@ public class AwtrixSensorService implements SensorService {
     @Override
     public int getTemperature() {
         AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
-        return null == awtrixStats ? 0 : awtrixStats.temp();
+        return (null == awtrixStats || null == awtrixStats.temp()) ? 0 : awtrixStats.temp();
     }
 
     @Override
     public int getHumidity() {
         AwtrixStats awtrixStats = awtrixService.getAwtrixStats();
-        return null == awtrixStats ? 0 : awtrixStats.hum();
+        return (null == awtrixStats || null == awtrixStats.hum()) ? 0 : awtrixStats.hum();
     }
 }

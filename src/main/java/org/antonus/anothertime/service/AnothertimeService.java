@@ -1,19 +1,19 @@
 package org.antonus.anothertime.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.message.publish.Mqtt3Publish;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.antonus.anothertime.config.AnothertimeProperties;
 import org.antonus.anothertime.model.*;
 import org.antonus.anothertime.types.SeparatorAnimation;
 import org.antonus.anothertime.types.TimeAnimation;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttException;
-import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.awt.*;
 import java.io.Closeable;
@@ -44,9 +44,9 @@ public class AnothertimeService implements Closeable {
     @Value("${anothertime.awtrix-topic}/custom/anothertime")
     private String anothertimeTopic;
 
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
 
-    private final IMqttClient publisher;
+    private final Mqtt3AsyncClient publisher;
 
     private final AwtrixService awtrixService;
     private final AnothertimeProperties anothertimeProperties;
@@ -56,17 +56,19 @@ public class AnothertimeService implements Closeable {
 
     @Override
     public void close() {
-        try {
-            publisher.disconnect();
-            publisher.close();
-        } catch (MqttException e) {
-            throw new RuntimeException(e);
+        if (publisher != null && publisher.getState().isConnected()) {
+            publisher.disconnect().whenComplete((ignored, throwable) -> {
+                if (throwable != null) {
+                    log.error(throwable.getMessage(), throwable);
+                }
+            });
         }
     }
 
     private Color defaultColorIfNull(Color color) {
         return iconsService.defaultColorIfNull(color);
     }
+
     private List<Draw> drawTime(LocalTime time) {
 
         Color hourColor = defaultColorIfNull(anothertimeProperties.getTime().getHourColor());
@@ -117,7 +119,7 @@ public class AnothertimeService implements Closeable {
             String timeString = time.format(FORMAT_HOUR_AND_MINUTES);
             String previous = time.minus(Duration.ofMinutes(1)).format(FORMAT_HOUR_AND_MINUTES);
             // calculate which digits changed
-            for(int i = 0; i < 4; i++) {
+            for (int i = 0; i < 4; i++) {
                 Color timeColor = i < 2 ? hourColor : minutesColor;
                 // digit changed
                 if (timeString.charAt(i) != previous.charAt(i)) {
@@ -143,7 +145,7 @@ public class AnothertimeService implements Closeable {
                 xpos += 4;
 
                 // add the separator after the second digit
-                if (i == 1 ) {
+                if (i == 1) {
                     if (null != separatorColor) {
                         drawList.add(new Text(xpos, 1, ":", separatorColor));
                     }
@@ -206,7 +208,7 @@ End Sub
         int second = time.getSecond();
 
         if (secondsBackgroundColor != Color.BLACK) {
-            drawList.add(new Line(0,7, secondsProgressSize - 1, 7, secondsBackgroundColor));
+            drawList.add(new Line(0, 7, secondsProgressSize - 1, 7, secondsBackgroundColor));
         }
         if (second > 0) {
             drawList.add(new Line(0, 7, second * secondsProgressSize / 60, 7, secondsColor));
@@ -230,19 +232,19 @@ End Sub
         switch (anothertimeProperties.getWeek().getStyle()) {
             case LARGE -> {
                 drawList.add(new Line(xpos, 7, 31, 7, weekDaysColor));
-                drawList.add(new Line(xpos+(weekday-1)*2, 7, xpos+(weekday-1)*2+1, 7, currentDayColor));
+                drawList.add(new Line(xpos + (weekday - 1) * 2, 7, xpos + (weekday - 1) * 2 + 1, 7, currentDayColor));
             }
             case PROGRESS -> {
                 drawList.add(new Line(xpos, 7, 31, 7, weekDaysColor));
-                drawList.add(new Line(xpos, 7, xpos+(weekday-1)*2+1, 7, currentDayColor));
+                drawList.add(new Line(xpos, 7, xpos + (weekday - 1) * 2 + 1, 7, currentDayColor));
             }
             case DOTTED -> {
                 drawList.add(new Line(xpos, 7, 31, 7, Color.black));
                 for (int i = 0; i < 7; i++) {
                     if (i == weekday - 1) {
-                        drawList.add(new Pixel(xpos+i*2,7,currentDayColor));
+                        drawList.add(new Pixel(xpos + i * 2, 7, currentDayColor));
                     } else {
-                        drawList.add(new Pixel(xpos+i*2,7,weekDaysColor));
+                        drawList.add(new Pixel(xpos + i * 2, 7, weekDaysColor));
                     }
                 }
             }
@@ -250,7 +252,7 @@ End Sub
                 drawList.add(new Line(xpos, 7, 31, 7, Color.black));
                 for (int i = 0; i < 7; i++) {
                     if (i == weekday - 1) {
-                        drawList.add(new Line(xpos, 7, xpos+1,7,currentDayColor));
+                        drawList.add(new Line(xpos, 7, xpos + 1, 7, currentDayColor));
                         xpos += 3;
                     } else {
                         drawList.add(new Pixel(xpos, 7, weekDaysColor));
@@ -265,14 +267,12 @@ End Sub
 
     @Scheduled(fixedDelay = TICK_INTERVAL)
     @Async
-    public void tick() throws MqttException, IOException {
+    public void tick() throws IOException {
 
         // Do nothing if current app is not anothertime
         if (anothertimeProperties.getPauseIfHidden() && !"anothertime".equals(awtrixService.getCurrentApp())) {
             return;
         }
-
-        MqttMessage message = new MqttMessage();
 
         LocalTime time = LocalTime.now();
 
@@ -289,9 +289,14 @@ End Sub
         AwtrixPayload payload = AwtrixPayload.builder().draw(drawList).build();
         //awtrixClient.sendCustomAnothertime(payload);
 //        awtrixClient.sendCustomAnothertime(objectMapper.writeValueAsString(payload));
-        message.setPayload(objectMapper.writeValueAsBytes(payload));
-        message.setQos(0);
-        publisher.publish(anothertimeTopic, message);
+
+        publisher.publishWith()
+                .topic(anothertimeTopic)
+                .payload(jsonMapper.writeValueAsBytes(payload))
+                .qos(MqttQos.AT_MOST_ONCE)
+                .send();
+
+
     }
 
 }

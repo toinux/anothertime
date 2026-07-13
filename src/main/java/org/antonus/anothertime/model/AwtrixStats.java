@@ -1,23 +1,23 @@
 package org.antonus.anothertime.model;
 
 public record AwtrixStats(
-        int type,
-        int lux,
-        int ldr_raw,
-        int ram,
-        int bri,
-        int temp,
-        int hum,
-        long uptime,
-        int wifi_signal,
-        long messages,
+        Integer type,
+        Integer lux,
+        Integer ldr_raw,
+        Integer ram,
+        Integer bri,
+        Integer temp,
+        Integer hum,
+        Long uptime,
+        Integer wifi_signal,
+        Long messages,
         String version,
-        boolean indicator1,
-        boolean indicator2,
-        boolean indicator3,
+        Boolean indicator1,
+        Boolean indicator2,
+        Boolean indicator3,
         String app,
         String uid,
-        boolean matrix,
+        Boolean matrix,
         String ip_address
 ) {
 }
