@@ -1,21 +1,17 @@
 plugins {
     java
-    id("org.springframework.boot") version "3.2.3"
-    id("io.spring.dependency-management") version "1.1.4"
+    id("org.springframework.boot") version "4.1.0"
+    id("io.spring.dependency-management") version "1.1.7"
 }
 
 group = "org.antonus"
-version = "1.0.0"
+version = "1.1.0"
 
-val mapstructVersion = "1.5.5.Final"
+val mapstructVersion = "1.6.3"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_21
-}
-
-configurations {
-    compileOnly {
-        extendsFrom(configurations.annotationProcessor.get())
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -25,9 +21,10 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-restclient")
     implementation("org.springframework.boot:spring-boot-starter-json")
     implementation("org.springframework.boot:spring-boot-starter-cache")
-    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.jayway.jsonpath:json-path")
     implementation("net.minidev:json-smart")
@@ -39,7 +36,11 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    implementation("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5")
+    implementation("com.hivemq:hivemq-mqtt-client:1.3.3")
+}
+
+tasks.named<Jar>("jar") {
+    enabled = false
 }
 
 tasks.withType<Test> {

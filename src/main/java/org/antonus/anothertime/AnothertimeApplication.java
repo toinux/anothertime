@@ -1,8 +1,9 @@
 package org.antonus.anothertime;
 
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.hivemq.client.mqtt.MqttClient;
+import com.hivemq.client.mqtt.mqtt3.Mqtt3AsyncClient;
+import com.hivemq.client.mqtt.mqtt3.message.connect.Mqtt3Connect;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.antonus.anothertime.config.AnothertimeProperties;
@@ -14,10 +15,6 @@ import org.antonus.anothertime.service.AwtrixSensorService;
 import org.antonus.anothertime.service.AwtrixService;
 import org.antonus.anothertime.service.MqttSensorService;
 import org.antonus.anothertime.service.SensorService;
-import org.eclipse.paho.client.mqttv3.IMqttClient;
-import org.eclipse.paho.client.mqttv3.MqttClient;
-import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
-import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,16 +23,19 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.awt.*;
-import java.util.List;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -55,14 +55,15 @@ public class AnothertimeApplication {
 
     @Bean
     AwtrixClient awtrixClient(RestClient.Builder builder) {
-        Assert.notNull(anothertimeProperties.getAwtrixUrl(),"Please set anothertime.awtrix-url");
+        Assert.notNull(anothertimeProperties.getAwtrixUrl(), "Please set anothertime.awtrix-url");
         RestClient restClient = builder
                 .baseUrl(anothertimeProperties.getAwtrixUrl())
-                .requestFactory(new JdkClientHttpRequestFactory())
-                .messageConverters(httpMessageConverters -> {
-                    var jsonConverter = new MappingJackson2HttpMessageConverter();
-                    jsonConverter.setSupportedMediaTypes(List.of(new MediaType("text", "json")));
-                    httpMessageConverters.add(jsonConverter);
+                .requestFactory(new JdkClientHttpRequestFactory()).configureMessageConverters(httpMessageConverters -> {
+                    var jsonConverter = new JacksonJsonHttpMessageConverter();
+                    var mediaTypes = new ArrayList<>(jsonConverter.getSupportedMediaTypes());
+                    mediaTypes.add(new MediaType("text", "json"));
+                    jsonConverter.setSupportedMediaTypes(mediaTypes);
+                    httpMessageConverters.withJsonConverter(jsonConverter);
                 })
                 .build();
 
@@ -74,28 +75,48 @@ public class AnothertimeApplication {
 
     @Bean
     @SneakyThrows
-    IMqttClient publisher(AwtrixService awtrixService) {
-        Assert.notNull(anothertimeProperties.getBrokerUrl(),"Please set anothertime.broker-url");
-        IMqttClient publisher = new MqttClient(anothertimeProperties.getBrokerUrl(), UUID.randomUUID().toString(), new MemoryPersistence());
-        MqttConnectOptions options = new MqttConnectOptions();
+    Mqtt3AsyncClient mqttClient(AwtrixService awtrixService) {
+        Assert.notNull(anothertimeProperties.getBrokerUrl(), "Please set anothertime.broker-url");
+
+        var brokerUri = new URI(anothertimeProperties.getBrokerUrl());
+        String host = brokerUri.getHost();
+        int port = brokerUri.getPort() != -1 ? brokerUri.getPort() : 1883;
+
+        var client = MqttClient.builder().useMqttVersion3()
+                .identifier(UUID.randomUUID().toString())
+                .serverHost(host)
+                .serverPort(port)
+                .buildAsync();
+
+
         if (null != anothertimeProperties.getBrokerUsername()) {
-            options.setUserName(anothertimeProperties.getBrokerUsername());
+            var auth = Mqtt3Connect.builder().simpleAuth().username(anothertimeProperties.getBrokerUsername());
+
+            if (null == anothertimeProperties.getBrokerPassword()) {
+                client.connect(auth.applySimpleAuth().build());
+            } else {
+                client.connect(auth.password(anothertimeProperties.getBrokerPassword().getBytes()).applySimpleAuth().build());
+            }
+        } else {
+            client.connect();
         }
-        if (null != anothertimeProperties.getBrokerPassword()) {
-            options.setPassword(anothertimeProperties.getBrokerPassword().toCharArray());
-        }
-        options.setAutomaticReconnect(true);
-        options.setCleanSession(true);
-        options.setConnectionTimeout(10);
-        publisher.connect(options);
-        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats", (topic, message) -> awtrixService.handleStats(message));
-        publisher.subscribe(anothertimeProperties.getAwtrixTopic()+"/stats/currentApp", (topic, message) -> awtrixService.handleCurrentApp(message));
-        return publisher;
+
+        client.subscribeWith()
+                .topicFilter(anothertimeProperties.getAwtrixTopic() + "/stats")
+                .callback(awtrixService::handleStats)
+                .send();
+
+        client.subscribeWith()
+                .topicFilter(anothertimeProperties.getAwtrixTopic() + "/stats/currentApp")
+                .callback(awtrixService::handleCurrentApp)
+                .send();
+
+        return client;
     }
 
     @Bean
     @SneakyThrows
-    SensorService sensorService(IMqttClient publisher, AwtrixService awtrixService) {
+    SensorService sensorService(Mqtt3AsyncClient client, AwtrixService awtrixService) {
         return switch (anothertimeProperties.getSensorType()) {
             case AWTRIX -> new AwtrixSensorService(awtrixService);
             case MQTT -> {
@@ -104,10 +125,21 @@ public class AnothertimeApplication {
                 String humidity = anothertimeProperties.getMqttSensor().getHumidity();
                 String temperature = anothertimeProperties.getMqttSensor().getTemperature();
                 if (null == topic) {
-                    publisher.subscribe(humidity, ((t, message) -> mqttSensorService.handleHumidity(message)));
-                    publisher.subscribe(temperature, ((t, message) -> mqttSensorService.handleTemperature(message)));
+                    client.subscribeWith()
+                            .topicFilter(humidity)
+                            .callback(mqttSensorService::handleHumidity)
+                            .send();
+                    client.subscribeWith()
+                            .topicFilter(temperature)
+                            .callback(mqttSensorService::handleTemperature)
+                            .send();
+
                 } else {
-                    publisher.subscribe(topic, ((t, message) -> mqttSensorService.handleJson(message, humidity, temperature)));
+                    client.subscribeWith()
+                            .topicFilter(topic)
+                            .callback((message) -> mqttSensorService.handleJson(message, humidity, temperature))
+                            .send();
+
                 }
                 yield mqttSensorService;
             }
@@ -124,8 +156,22 @@ public class AnothertimeApplication {
         return new CaffeineCache("settings", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
     }
 
+    @Bean("dimmedIconKeyGenerator")
+    public KeyGenerator keyGenerator() {
+        return (target, method, params) -> {
+            // param0 : icon
+            // param1 : defaultIcon
+            // param2 : dim
+
+            var dim = (float) params[2];
+            BigDecimal rounded = (new BigDecimal(dim)).setScale(2, RoundingMode.FLOOR);
+
+            return params[0] + "_" + params[1] + "_" + rounded;
+        };
+    }
+
     @Bean
-    Module colorModule(ColorConverter colorConverter) {
+    JacksonModule colorModule(ColorConverter colorConverter) {
         SimpleModule colorModule = new SimpleModule();
         colorModule.addSerializer(Color.class, new ColorToStringConverter());
         colorModule.addDeserializer(Color.class, new StringToColorConverter(colorConverter));

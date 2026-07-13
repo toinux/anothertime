@@ -1,6 +1,5 @@
 package org.antonus.anothertime.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -12,13 +11,14 @@ import org.antonus.anothertime.model.AnothertimePropertiesDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class SettingsService {
     private final AnothertimeProperties anothertimeProperties;
-    private final ObjectMapper objectMapper;
+    private final JsonMapper jsonMapper;
     private final AnothertimePropertiesMapper mapper;
     private final AnothertimePropertiesWithNullStragegyMapper nullStragegyMapper;
     @Value("file:./anothertime-settings.json")
@@ -29,7 +29,7 @@ public class SettingsService {
         if (settingsResource.exists()) {
             try {
                 log.info("anothertime-settings.json found, applying settings");
-                AnothertimePropertiesDto anothertimePropertiesDto = objectMapper.readValue(settingsResource.getFile(), AnothertimePropertiesDto.class);
+                AnothertimePropertiesDto anothertimePropertiesDto = jsonMapper.readValue(settingsResource.getFile(), AnothertimePropertiesDto.class);
                 nullStragegyMapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
             } catch (Exception e) {
                 log.error("could not load anothertime-settings.json : {}", e.getMessage());
@@ -41,7 +41,7 @@ public class SettingsService {
 
     @SneakyThrows
     public void saveSettings() {
-        objectMapper.writeValue(settingsResource.getFile(), mapper.map(anothertimeProperties));
+        jsonMapper.writeValue(settingsResource.getFile(), mapper.map(anothertimeProperties));
         log.info("settings saved to {}", settingsResource.getFile());
     }
 }

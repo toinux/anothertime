@@ -31,13 +31,15 @@ public class ConfigController {
     }
 
     @PostMapping("/config")
-    void postConfig(@RequestBody AnothertimePropertiesDto anothertimePropertiesDto) {
+    AnothertimePropertiesDto postConfig(@RequestBody AnothertimePropertiesDto anothertimePropertiesDto) {
         mapper.updateFromDto(anothertimePropertiesDto, anothertimeProperties);
+        return getConfig();
     }
 
     @PostMapping("/load")
-    void load() {
+    AnothertimePropertiesDto load() {
         settingsService.loadSettings();
+        return getConfig();
     }
 
     @PostMapping("/save")
