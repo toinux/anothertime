@@ -18,8 +18,11 @@ import org.antonus.anothertime.service.SensorService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -147,13 +150,10 @@ public class AnothertimeApplication {
     }
 
     @Bean
-    CaffeineCache iconsCache() {
-        return new CaffeineCache("icons", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
-    }
-
-    @Bean
-    CaffeineCache settingsCache() {
-        return new CaffeineCache("settings", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
+    CacheManager cacheManager() {
+        var cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS));
+        return cacheManager;
     }
 
     @Bean

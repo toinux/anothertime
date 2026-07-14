@@ -5,6 +5,7 @@ import org.antonus.anothertime.icons.AnimatedFrame;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.awt.*;
 import java.math.BigDecimal;
@@ -20,8 +21,8 @@ public class IconsService {
     private final CacheManager cacheManager;
 
     public int[] getDimmedIcon(String iconName, String defaultIcon, float dim) {
-        Cache cache = cacheManager.getCache("icons");
-        assert cache != null;
+        Cache cache = cacheManager.getCache("dimmedicons");
+        Assert.notNull(cache, "cache 'icons' must not be null");
 
         AnimatedFrame animatedFrame = awtrixService.getIcon(iconName, defaultIcon).getFrame();
 

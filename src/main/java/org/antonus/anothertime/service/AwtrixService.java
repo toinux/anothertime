@@ -12,10 +12,10 @@ import org.antonus.anothertime.rest.AwtrixClient;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.json.JsonMapper;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import tools.jackson.databind.json.JsonMapper;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -26,6 +26,7 @@ import java.awt.*;
 import java.awt.image.PixelGrabber;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Iterator;
 
 import static org.antonus.anothertime.utils.ColorUtils.rgb888;
 
@@ -47,34 +48,44 @@ public class AwtrixService {
     @Cacheable(value = "icons", sync = true)
     public AnimatedIcon getIcon(String iconName, String defaultIcon) {
         if (null == iconName || iconName.isBlank() || iconName.equalsIgnoreCase("default")) {
-            AnimatedIcon defaultAnimatedIcon = new AnimatedIcon();
-            // TODO : animate default icon too
-            defaultAnimatedIcon.addFrame(0, 0, getDefaultIcon(defaultIcon));
-            return  defaultAnimatedIcon;
-            // return getDefaultIcon(defaultIcon);
+            return getDefaultIcon(defaultIcon);
         }
         try {
-
-            ImageReader ir = ImageIO.getImageReadersBySuffix("gif").next();
-            ImageInputStream is = ImageIO.createImageInputStream(new ByteArrayInputStream(awtrixClient.getIcon(iconName)));
-            ir.setInput(is, false);
-            int numFrames = ir.getNumImages(true);
-            AnimatedIcon animatedIcon = new AnimatedIcon();
-            for (int i = 0; i < numFrames; i++) {
-                animatedIcon.addFrame(i, getFrameDelay(ir, i), imageToBmp(ir.read(i)));
-            }
-            return animatedIcon;
-
-            // return imageToBmp(ImageIO.read(new ByteArrayInputStream(awtrixClient.getIcon(iconName))));
+            return decodeIcon(awtrixClient.getIcon(iconName));
         } catch (Exception e) {
             log.info("could not load icon {}, loading default icon {} instead", iconName, defaultIcon);
-            AnimatedIcon defaultAnimatedIcon = new AnimatedIcon();
-            // TODO : animate default icon too
-            defaultAnimatedIcon.addFrame(0,0, getDefaultIcon(defaultIcon));
-            return  defaultAnimatedIcon;
-            //return getDefaultIcon(defaultIcon);
+            return getDefaultIcon(defaultIcon);
         }
     }
+
+    private static AnimatedIcon decodeIcon(byte[] iconBytes) throws IOException, InterruptedException {
+        ImageReader ir = null;
+        try (ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(iconBytes))) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (!readers.hasNext()) {
+                throw new IOException("no ImageReader found for this icon format");
+            }
+
+            ir = readers.next();
+            ir.setInput(iis, false);
+
+            boolean isAnimatedGif = "gif".equalsIgnoreCase(ir.getFormatName());
+            int numFrames = isAnimatedGif ? ir.getNumImages(true) : 1;
+
+            AnimatedIcon animatedIcon = new AnimatedIcon();
+            for (int i = 0; i < numFrames; i++) {
+                int delay = isAnimatedGif ? getFrameDelay(ir, i) : 0;
+                animatedIcon.addFrame(i, delay, imageToBmp(ir.read(i)));
+            }
+
+            return animatedIcon;
+        } finally {
+            if (ir != null) {
+                ir.dispose();
+            }
+        }
+    }
+
 
     private static int getFrameDelay(ImageReader reader, int frameIndex) throws IOException {
         // Get the metadata of the current frame
@@ -99,12 +110,12 @@ public class AwtrixService {
         return delay;
     }
 
-    private int[] getDefaultIcon(String defaultIcon) {
+    private AnimatedIcon getDefaultIcon(String defaultIcon) {
         if (null == defaultIcon) {
             return null;
         }
         try {
-            return imageToBmp(ImageIO.read(resourceLoader.getResource("classpath:icons/" + defaultIcon).getInputStream()));
+            return decodeIcon(resourceLoader.getResource("classpath:icons/" + defaultIcon).getContentAsByteArray());
         } catch (Exception e) {
             log.error("Could not load default icon {} : {}", defaultIcon, e.getMessage());
         }
