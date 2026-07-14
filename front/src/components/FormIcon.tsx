@@ -40,7 +40,7 @@ export function FormIcon({ label, path }: FormIconProps) {
     const icons = data || [];
 
     // Map pemettant de retrouver l'url d'un icon par rapport à son nom
-    const iconsMap = useMemo(()=>{
+    const iconsMap = useMemo(() => {
         const map = new Map<string, string>();
         if (!data) return map;
         data.forEach((item) => {
@@ -111,8 +111,8 @@ export function FormIcon({ label, path }: FormIconProps) {
                                 <div>
                                     {iconsMap.get(selectValue ?? '') && (
                                         <img
-                                            className={'size-6 [image-rendering:pixelated] mr-2'}
-                                            alt={selectValue??''}
+                                            className={'mr-2 size-6 [image-rendering:pixelated]'}
+                                            alt={selectValue ?? ''}
                                             src={iconsMap.get(selectValue ?? '')}
                                         />
                                     )}
@@ -155,9 +155,7 @@ export function FormIcon({ label, path }: FormIconProps) {
                             </Button>
                         }
                     />
-                    <Button variant={'outline'} size={'icon'}>
-                        <IconInfo />
-                    </Button>
+                    <IconInfo />
                 </ButtonGroup>
             </div>
             {/*TODO: voir plus tard pour les animations, pour l'instant ça marche qu'avec radix*/}
