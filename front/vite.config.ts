@@ -39,7 +39,7 @@ export default defineConfig({
     "semi": true,
     "singleQuote": true,
     "sortTailwindcss": {},
-    "printWidth": 100,
+    "printWidth": 120,
     "sortPackageJson": false,
     "ignorePatterns": [
       "/*",
