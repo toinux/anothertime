@@ -6,8 +6,8 @@ import { FormBoolean } from '@/components/FormBoolean.tsx';
 export function Week() {
     return (
         <SettingsContainer title="Week">
-            <FormBoolean label={'Start sunday'} path={'week.startSunday'}/>
-            <FormSelect label={'Style'} values={['LARGE', 'PROGRESS', 'DOTTED', 'DOTTED2']} path={'week.style'}/>
+            <FormBoolean label={'Start sunday'} path={'week.startSunday'} />
+            <FormSelect label={'Style'} values={['LARGE', 'PROGRESS', 'DOTTED', 'DOTTED2']} path={'week.style'} />
             <FormColor label={'Day color'} path="week.dayColor" />
             <FormColor label={'Week color'} path="week.weekColor" />
         </SettingsContainer>

@@ -18,7 +18,7 @@ export function CalendarWidget() {
             <FormSelect values={['ICON', 'LARGE', 'SMALL']} label={'Style'} path="widgets.calendar.style" />
             {config.widgets.calendar.style === 'ICON' ? (
                 <>
-                    <FormIcon label={'Icon'} path="widgets.calendar.icon"/>
+                    <FormIcon label={'Icon'} path="widgets.calendar.icon" />
                     <FormColor label={'Color'} path="widgets.calendar.color" />
                 </>
             ) : (

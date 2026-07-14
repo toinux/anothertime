@@ -64,7 +64,8 @@ export const useReloadMutation = () => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationKey: ['reload'],
-        mutationFn: async () => /*api.post('/load').json(anothertimeConfigSchema),*/
+        mutationFn: async () =>
+            /*api.post('/load').json(anothertimeConfigSchema),*/
             toast.promise(api.post('/load').json(anothertimeConfigSchema), {
                 loading: 'Reloading settings...',
                 error: (data) => {

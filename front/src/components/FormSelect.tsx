@@ -27,28 +27,26 @@ export function FormSelect<P extends SelectPath>({ label, values, path }: FormSe
 
     return (
         <div className={'mb-4 flex'}>
-                <Label
-                    className={
-                        "bg-accent pl-2 w-48 rounded-tl-md rounded-bl-md border border-r-0 text-base"
-                    }
-                    htmlFor={id}
-                >
-                    {label}
-                </Label>
-                <Select value={value} onValueChange={handleValueChange}>
-                    <SelectTrigger className={'rounded-tl-none rounded-bl-none grow'} id={id}>
-                        <SelectValue placeholder={label} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {values.map((o) => {
-                            return (
-                                <SelectItem key={o} value={o}>
-                                    {o}
-                                </SelectItem>
-                            );
-                        })}
-                    </SelectContent>
-                </Select>
+            <Label
+                className={'bg-accent w-48 rounded-tl-md rounded-bl-md border border-r-0 pl-2 text-base'}
+                htmlFor={id}
+            >
+                {label}
+            </Label>
+            <Select value={value} onValueChange={handleValueChange}>
+                <SelectTrigger className={'grow rounded-tl-none rounded-bl-none'} id={id}>
+                    <SelectValue placeholder={label} />
+                </SelectTrigger>
+                <SelectContent>
+                    {values.map((o) => {
+                        return (
+                            <SelectItem key={o} value={o}>
+                                {o}
+                            </SelectItem>
+                        );
+                    })}
+                </SelectContent>
+            </Select>
         </div>
     );
 }

@@ -29,7 +29,7 @@ function App() {
                             {({ reset }) => (
                                 <ErrorBoundary onReset={reset} FallbackComponent={ErrorBoundaryFallback}>
                                     <Home />
-                                    <Toaster position={"bottom-center"} richColors={true}/>
+                                    <Toaster position={'bottom-center'} richColors={true} />
                                 </ErrorBoundary>
                             )}
                         </QueryErrorResetBoundary>
