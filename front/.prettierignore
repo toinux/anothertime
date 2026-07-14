@@ -1,8 +1,0 @@
-# Ignorer tout par défaut
-/*
-
-# Ne pas ignorer le dossier src
-!/src/
-
-# Ré-ignorer src/components/ui
-/src/components/ui

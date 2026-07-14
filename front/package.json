@@ -4,11 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "oxlint",
-    "prettier": "prettier -c . --write",
-    "preview": "vite preview"
+    "dev": "vp dev",
+    "build": "tsc -b && vp build",
+    "lint": "vp lint",
+    "fmt": "vp fmt --check .",
+    "preview": "vp preview"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
@@ -47,10 +47,15 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.3",
     "babel-plugin-react-compiler": "^1.0.0",
-    "oxlint": "^1.71.0",
-    "prettier": "3.9.5",
-    "prettier-plugin-tailwindcss": "^0.8.0",
     "typescript": "~6.0.2",
-    "vite": "^8.1.1"
+    "vite": "catalog:",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "11.13.0",
+      "onFail": "download"
+    }
   }
 }
