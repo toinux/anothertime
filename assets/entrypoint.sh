@@ -4,9 +4,12 @@ set -o pipefail
 
 EMBEDDED_JAR="/opt/anothertime/anothertime.jar"
 
-if [[ ! -f anothertime.jar ]]; then
+if [[ -f anothertime.jar ]]; then
+  echo "using anothertime.jar found in /data instead of embedded jar"
+  JAR_TO_RUN="anothertime.jar"
+else
   echo "anothertime.jar not found in /data, using embedded jar"
-  cp "${EMBEDDED_JAR}" anothertime.jar
+  JAR_TO_RUN="${EMBEDDED_JAR}"
 fi
 
-java -jar anothertime.jar
+java -jar "${JAR_TO_RUN}"
