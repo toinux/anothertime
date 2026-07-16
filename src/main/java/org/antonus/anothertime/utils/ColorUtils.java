@@ -11,6 +11,13 @@ public class ColorUtils {
         return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
     }
 
+    public static int dimRgb888(int rgb, float dim) {
+        int r = (int) (((rgb >> 16) & 0xFF) * dim);
+        int g = (int) (((rgb >> 8) & 0xFF) * dim);
+        int b = (int) ((rgb & 0xFF) * dim);
+        return (r << 16) | (g << 8) | b;
+    }
+
     public static Color rbg888(int color) {
         int red = (color >> 16) & 0xFF;
         int green = (color >> 8) & 0xFF;
