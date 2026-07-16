@@ -28,8 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Iterator;
 
-import static org.antonus.anothertime.utils.ColorUtils.rgb888;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -89,7 +87,6 @@ public class AwtrixService {
 
     private static int getFrameDelay(ImageReader reader, int frameIndex) throws IOException {
         // Get the metadata of the current frame
-        int delay = 0;
         int imageMetadataIndex = reader.getMinIndex() + frameIndex;
         IIOMetadata imageMetadata = reader.getImageMetadata(imageMetadataIndex);
         String metaFormatName = imageMetadata.getNativeMetadataFormatName();
@@ -97,17 +94,11 @@ public class AwtrixService {
         IIOMetadataNode root = (IIOMetadataNode) imageMetadata.getAsTree(metaFormatName);
         NodeList children = root.getElementsByTagName("GraphicControlExtension");
 
-        // Loop through GraphicControlExtension nodes to find delay time
-        for (int i = 0; i < children.getLength(); i++) {
-            Node nodeItem = children.item(i);
-            NamedNodeMap attr = nodeItem.getAttributes();
-            Node delayNode = attr.getNamedItem("delayTime");
-            if (delayNode != null) {
-                delay = Integer.parseInt(delayNode.getNodeValue()) * 10; // Convert to milliseconds
-                break;
-            }
-        }
-        return delay;
+        if (children.getLength() == 0) return 0;
+
+        Node delayNode = children.item(0).getAttributes().getNamedItem("delayTime");
+        return delayNode != null ? Integer.parseInt(delayNode.getNodeValue()) * 10 : 0; // * 10 to onvert to milliseconds
+
     }
 
     private AnimatedIcon getDefaultIcon(String defaultIcon) {
@@ -143,7 +134,7 @@ public class AwtrixService {
         pg.grabPixels();
 
         for (int i = 0; i < 8 * 8; i++) {
-            pixelArray[i] = rgb888(new Color(pixelArray[i]));
+            pixelArray[i] &= 0x00FFFFFF; // conversion rgb888
         }
 
         return pixelArray;

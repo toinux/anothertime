@@ -7,10 +7,6 @@ public class ColorUtils {
         return new Color((int) (color.getRed() * percent), (int) (color.getGreen() * percent), (int) (color.getBlue() * percent));
     }
 
-    public static int rgb888(Color color) {
-        return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
-    }
-
     public static int dimRgb888(int rgb, float dim) {
         int r = (int) (((rgb >> 16) & 0xFF) * dim);
         int g = (int) (((rgb >> 8) & 0xFF) * dim);
