@@ -7,17 +7,11 @@ public class ColorUtils {
         return new Color((int) (color.getRed() * percent), (int) (color.getGreen() * percent), (int) (color.getBlue() * percent));
     }
 
-/*    public static int[] dimIcon(int[] icon, float dim) {
-        System.out.println((new BigDecimal(dim)).setScale(2, RoundingMode.FLOOR));
-        int[] result = new int[icon.length];
-        for (int i = 0; i < icon.length ; i++) {
-            result[i] = rgb888(dimColor(Color.decode(Integer.toString(icon[i])), dim));
-        }
-        return result;
-    }*/
-
-    public static int rgb888(Color color) {
-        return color.getRed() << 16 | color.getGreen() << 8 | color.getBlue();
+    public static int dimRgb888(int rgb, float dim) {
+        int r = (int) (((rgb >> 16) & 0xFF) * dim);
+        int g = (int) (((rgb >> 8) & 0xFF) * dim);
+        int b = (int) ((rgb & 0xFF) * dim);
+        return (r << 16) | (g << 8) | b;
     }
 
     public static Color rbg888(int color) {

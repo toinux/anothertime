@@ -18,9 +18,9 @@ import org.antonus.anothertime.service.SensorService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.caffeine.CaffeineCache;
-import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.JdkClientHttpRequestFactory;
@@ -35,8 +35,6 @@ import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.module.SimpleModule;
 
 import java.awt.*;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -86,6 +84,7 @@ public class AnothertimeApplication {
         int port = brokerUri.getPort() != -1 ? brokerUri.getPort() : 1883;
 
         var client = MqttClient.builder().useMqttVersion3()
+                .automaticReconnectWithDefaultConfig()
                 .identifier(UUID.randomUUID().toString())
                 .serverHost(host)
                 .serverPort(port)
@@ -150,27 +149,10 @@ public class AnothertimeApplication {
     }
 
     @Bean
-    CaffeineCache iconsCache() {
-        return new CaffeineCache("icons", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
-    }
-
-    @Bean
-    CaffeineCache settingsCache() {
-        return new CaffeineCache("settings", Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS).build());
-    }
-
-    @Bean("dimmedIconKeyGenerator")
-    public KeyGenerator keyGenerator() {
-        return (target, method, params) -> {
-            // param0 : icon
-            // param1 : defaultIcon
-            // param2 : dim
-
-            var dim = (float) params[2];
-            BigDecimal rounded = (new BigDecimal(dim)).setScale(2, RoundingMode.FLOOR);
-
-            return params[0] + "_" + params[1] + "_" + rounded;
-        };
+    CacheManager cacheManager() {
+        var cacheManager = new CaffeineCacheManager();
+        cacheManager.setCaffeine(Caffeine.newBuilder().expireAfterWrite(30, TimeUnit.DAYS));
+        return cacheManager;
     }
 
     @Bean
