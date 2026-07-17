@@ -84,6 +84,7 @@ public class AnothertimeApplication {
         int port = brokerUri.getPort() != -1 ? brokerUri.getPort() : 1883;
 
         var client = MqttClient.builder().useMqttVersion3()
+                .automaticReconnectWithDefaultConfig()
                 .identifier(UUID.randomUUID().toString())
                 .serverHost(host)
                 .serverPort(port)
